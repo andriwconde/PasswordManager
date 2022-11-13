@@ -6,7 +6,7 @@ const hola= 'hola'
 console.log(hola)
   return (
     <View>
-        <Text>Hola Mundo!</Text>
+        <Text>Hola Mundooooooooooo!</Text>
     </View>
   );
 };
