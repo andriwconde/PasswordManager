@@ -253,6 +253,8 @@ dependencies {
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    
+    implementation project(':react-native-fingerprint-scanner')
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
