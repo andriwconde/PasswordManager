@@ -1,7 +1,6 @@
 import React,{useState, useEffect} from 'react';
 import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal, NativeModules} from 'react-native'
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+
 import { increase, decrease } from '../redux/slices/loginSlice';
 import ButtonOne from '../components/ButtonOne';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
@@ -10,8 +9,7 @@ import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 
 const HomeScreen = ({navigation})  => {
-const contador = useSelector((state)=> state.contador.contador );
-const dispatch = useDispatch();
+
 
 const [emailInput,setEmailInput] = useState('')
 const [passwordInput,setPasswordInput] = useState('')
