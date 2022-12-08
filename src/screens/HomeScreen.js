@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { increase, decrease } from '../redux/slices/loginSlice';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-
-
+import PushNotificationIOS from "@react-native-community/push-notification-ios";
+import PushNotification from "react-native-push-notification";
 
 const HomeScreen = ({navigation})  => {
 const contador = useSelector((state)=> state.contador.contador );
@@ -22,13 +22,19 @@ useEffect(() => {
 },[])
 
 
+
+
 const handleInput =(input,value)=>{
 input === 'email' && setEmailInput(value) 
 input === 'password' && setPasswordInput(value)
 }
 const handleSubmit = async() => {
-  (emailInput === "" || passwordInput === "") && setModalState(true)
-
+  (emailInput === "" || passwordInput === "") ? setModalState(true) :
+  PushNotification.localNotification({
+    channelId: "nice-app",
+    title: "test-notification", // (optional)
+    message: "this is a testing notification", // (required)
+  });
 }
 
 
