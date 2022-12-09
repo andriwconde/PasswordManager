@@ -6,6 +6,8 @@ import { increase, decrease } from '../redux/slices/loginSlice';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import PushNotificationIOS from "@react-native-community/push-notification-ios";
 import PushNotification from "react-native-push-notification";
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
+
 
 const HomeScreen = ({navigation})  => {
 const contador = useSelector((state)=> state.contador.contador );
@@ -17,7 +19,14 @@ const [modalState, setModalState] = useState(false)
 
 useEffect(() => {
 
+  const RNBiometrics = new ReactNativeBiometrics()
+  const SensorType =async()=>{
+    const { biometryType } = await rnBiometrics.isSensorAvailable()
+    return biometryType
+  }
 
+  const {available,biometryType} = RNBiometrics.isSensorAvailable()
+  console.log(biometryType())
 
 },[])
 
