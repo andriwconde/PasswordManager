@@ -1,12 +1,9 @@
 import React,{useState, useEffect} from 'react';
-import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal, NativeModules} from 'react-native'
-
-import { increase, decrease } from '../redux/slices/loginSlice';
+import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal} from 'react-native'
 import ButtonOne from '../components/ButtonOne';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import PropTypes from 'prop-types';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-
+import BiometricPopUp from '../components/BiometricPopUp';
 
 const HomeScreen = ({navigation})  => {
 
@@ -14,12 +11,15 @@ const HomeScreen = ({navigation})  => {
 const [emailInput,setEmailInput] = useState('')
 const [passwordInput,setPasswordInput] = useState('')
 const [modalState, setModalState] = useState(false)
-
+const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
+const [fingerPrintButton,setFingerprintButton]=useState(false)
 useEffect(() => {
 
   FingerprintScanner
     .isSensorAvailable()
-    .then(biometryType => console.log({ biometryType }))
+    .then(biometryType => {
+      biometryType && setFingerprintButton(true)
+    })
     .catch(error => console.log(error)); 
 
 },[])
@@ -30,11 +30,7 @@ input === 'email' && setEmailInput(value)
 input === 'password' && setPasswordInput(value)
 }
 const handleSubmit = async() => {
-  (emailInput === "" || passwordInput === "") ? setModalState(true):
-  FingerprintScanner
-    .isSensorAvailable()
-    .then(biometryType => console.log({ biometryType }))
-    .catch(error => console.log(error)); 
+  (emailInput === "" || passwordInput === "") && setModalState(true)
 }
 
 
@@ -63,14 +59,16 @@ const handleSubmit = async() => {
             onChangeText={(value)=>handleInput('password',value)}
             />
           </View>
-          <View style={style.submitButtonView}>
+          <View style={style.buttonsView}>
+            {fingerPrintButton && <BiometricPopUp fingerprintPopUp={fingerprintPopUp} setFingerprintPopUp={setFingerprintPopUp}/>}
             <TouchableOpacity 
-            style={style.submitButton}
-            onPress={()=>handleSubmit()}
-            >
+              style={style.submitButton}
+              onPress={()=>handleSubmit()}
+              >
               <Text style={[style.textColorStyle,style.submitButtonText]}>Submit</Text>
             </TouchableOpacity>
           </View>
+          
         </View>
       </View>
       <Modal 
@@ -153,9 +151,10 @@ const style = StyleSheet.create({
     color:'#374FC6',
     fontSize:20
   },
-  submitButtonView:{
-    alignItems: 'flex-end',
-    marginTop:12
+  buttonsView:{
+    alignItems: 'center',
+    marginTop:10,
+    flexDirection:'row'
   },
   modalStyle:{
     flex:1,
@@ -190,6 +189,30 @@ const style = StyleSheet.create({
     alignSelf:'center',
     color:'white',
     fontSize:20
+  },
+  fingerPrintButton:{
+    backgroundColor:'white',
+    width:'65%',
+    paddingVertical:10,
+    borderRadius:5,
+    paddingHorizontal:5,
+    marginRight:15,
+    flexDirection:'row'
+  },
+  fingerPrintText:{
+    alignSelf:'center',
+    color:'#374FC6',
+    fontSize:13
+  },
+  fingerprintButtonView:{
+    alignItems: 'flex-end',
+    marginTop:12,
+    borderWidth:1
+  },
+  fingerSVG:{
+    height:'42%',
+    flex:1,
+    marginLeft:2
   }
 })
 
