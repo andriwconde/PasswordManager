@@ -3,7 +3,6 @@ import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal} from
 import ButtonOne from '../components/ButtonOne';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import BiometricPopUp from '../components/BiometricPopUp';
 
 const HomeScreen = ({navigation})  => {
 
