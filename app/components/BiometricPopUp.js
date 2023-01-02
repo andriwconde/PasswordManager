@@ -1,10 +1,14 @@
 import {StyleSheet, Text, View, TouchableOpacity, Platform} from 'react-native';
 import React, {useEffect} from 'react';
-import FingerprintIcon from '../../assets/images/icons/fingerprintIcon.svg'
+import { useDispatch, useSelector } from 'react-redux';
+import FingerprintIcon from '../assets/images/icons/fingerprintIcon.svg'
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-
+import { setLogin } from '../redux/slices/LoginSlice';
 
 const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
+  const login = useSelector(state => state.login)
+  const dispatch = useDispatch()
+  
   useEffect(() => {
     if (requiresLegacyAuthentication()) {
       authLegacy();
@@ -26,8 +30,8 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
       cancelButton: 'atras',
     })
       .then(() => {
-        console.log('hola');
-        this.props.onAuthenticate();
+        dispatch(setLogin())
+        console.log(login)
       })
       .catch(() => {
         setFingerprintPopUp(false);

@@ -1,18 +1,19 @@
 import React,{useState, useEffect} from 'react';
 import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal} from 'react-native'
-import ButtonOne from '../components/ButtonOne';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import BiometricPopUp from '../components/BiometricPopUp';
+import { setLogin } from '../redux/slices/LoginSlice';
 
 const HomeScreen = ({navigation})  => {
+  
+  const [modalState, setModalState] = useState(false)
+  const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
+  const [fingerPrintButton,setFingerprintButton]=useState(false)
+  const [formValues,setFormValues] = useState({
+    email:'',
+    password:''
+  })
 
-
-const [emailInput,setEmailInput] = useState('')
-const [passwordInput,setPasswordInput] = useState('')
-const [modalState, setModalState] = useState(false)
-const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
-const [fingerPrintButton,setFingerprintButton]=useState(false)
 useEffect(() => {
 
   FingerprintScanner
@@ -26,11 +27,11 @@ useEffect(() => {
 
 
 const handleInput =(input,value)=>{
-input === 'email' && setEmailInput(value) 
-input === 'password' && setPasswordInput(value)
+  setFormValues({...formValues,[input]:value})
 }
-const handleSubmit = async() => {
-  (emailInput === "" || passwordInput === "") && setModalState(true)
+const handleSubmit = async({email,password}) => {
+  (email === "" || password === "") && setModalState(true)
+  setLogin(formValues)
 }
 
 
@@ -63,7 +64,7 @@ const handleSubmit = async() => {
             {fingerPrintButton && <BiometricPopUp fingerprintPopUp={fingerprintPopUp} setFingerprintPopUp={setFingerprintPopUp}/>}
             <TouchableOpacity 
               style={style.submitButton}
-              onPress={()=>handleSubmit()}
+              onPress={()=>handleSubmit(formValues)}
               >
               <Text style={[style.textColorStyle,style.submitButtonText]}>Submit</Text>
             </TouchableOpacity>
