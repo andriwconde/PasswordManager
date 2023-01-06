@@ -1,7 +1,8 @@
-import {StyleSheet, Text, View, TouchableOpacity, Platform} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, Platform, Alert} from 'react-native';
 import React, {useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import FingerprintIcon from '../assets/images/icons/fingerprintIcon.svg'
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { setLogin } from '../redux/slices/LoginSlice';
 
@@ -30,11 +31,12 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
       cancelButton: 'atras',
     })
       .then(() => {
-        dispatch(setLogin())
-        console.log(login)
+        Alert.alert('Fingerprint Authentication', 'Authenticated successfully');
+        console.log('holaas')
+        setFingerprintPopUp(false)
       })
-      .catch(() => {
-        setFingerprintPopUp(false);
+      .catch((err) => {
+        setFingerprintPopUp(false)       
       });
   }
 
@@ -61,10 +63,10 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
       style={styles.fingerPrintButton}
       onPress={() => setFingerprintPopUp(true)}>
       <Text style={[styles.textColorStyle, styles.fingerPrintText]}>
-        Fingerprint Autentication
+        Fingerprint  Autentication
       </Text>
       <View style={styles.fingerSVG}>
-        <FingerprintIcon />
+        <Icon name='fingerprint' size={40} color="black" />
       </View>
     </TouchableOpacity>
   );
@@ -75,27 +77,23 @@ export default BiometricPopUp;
 const styles = StyleSheet.create({
   fingerPrintButton: {
     backgroundColor: 'white',
-    width: '65%',
     paddingVertical: 10,
     borderRadius: 5,
     paddingHorizontal: 5,
-    marginRight: 15,
     flexDirection: 'row',
+    justifyContent:'space-evenly',
+    alignItems:'center',
+    marginBottom:50
   },
   fingerPrintText: {
     alignSelf: 'center',
     color: '#374FC6',
-    fontSize: 13,
+    fontSize: 18,
   },
   fingerprintButtonView:{
     alignItems: 'flex-end',
     marginTop: 12,
     borderWidth: 1,
-  },
-  fingerSVG: {
-    height: '42%',
-    flex: 1,
-    marginLeft: 2,
   },
   textColorStyle: {
     fontWeight: 'bold',

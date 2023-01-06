@@ -3,6 +3,7 @@ import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal} from
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import BiometricPopUp from '../components/BiometricPopUp';
 import { setLogin } from '../redux/slices/LoginSlice';
+import {Divider} from '../components/Divider';
 
 const HomeScreen = ({navigation})  => {
   
@@ -38,38 +39,46 @@ const handleSubmit = async({email,password}) => {
   return (
     <View style={style.backgroundView}>
       <View style={style.loginForm}>
+      {fingerPrintButton && 
+              <BiometricPopUp fingerprintPopUp={fingerprintPopUp} setFingerprintPopUp={setFingerprintPopUp}/>
+            }
         <View style={style.loginTitle}>
-          <Text style={[style.titleText, style.textColorStyle]}>Login</Text>
+          <Text style={style.titleText}>Login</Text>
         </View>
         <View style={style.inputsView}>
           <View style={style.inputView}>
-            <Text style={[style.textColorStyle, style.inputTitleTextStyle]}>E-mail:</Text>
+            <Text style={style.inputTitleTextStyle}>E-mail:</Text>
             <TextInput 
               style={style.inputStyles} 
               placeholder='example@mail.com'
               onChangeText={(value)=>handleInput('email',value)}
               autoComplete='email'
+              placeholderTextColor='#C7C7C7'
             />
           </View>
           <View style={style.inputView}>
-            <Text style={[style.textColorStyle, style.inputTitleTextStyle]}>Password:</Text>
+            <Text style={style.inputTitleTextStyle}>Password:</Text>
             <TextInput 
             style={style.inputStyles} 
             placeholder='one-secure-password'
+            placeholderTextColor='#C7C7C7'
             secureTextEntry={true}
             onChangeText={(value)=>handleInput('password',value)}
             />
           </View>
-          <View style={style.buttonsView}>
-            {fingerPrintButton && <BiometricPopUp fingerprintPopUp={fingerprintPopUp} setFingerprintPopUp={setFingerprintPopUp}/>}
-            <TouchableOpacity 
-              style={style.submitButton}
-              onPress={()=>handleSubmit(formValues)}
-              >
-              <Text style={[style.textColorStyle,style.submitButtonText]}>Submit</Text>
-            </TouchableOpacity>
-          </View>
-          
+          <TouchableOpacity 
+            style={style.submitButton}
+            onPress={()=>handleSubmit(formValues)}
+            >
+            <Text style={style.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
+          <Divider/>
+          <TouchableOpacity 
+            style={style.toRegisterLink}
+            onPress={()=>navigation.navigate('Register')}
+            >
+            <Text style={style.toRegisterLinkText}>Create an account</Text>
+          </TouchableOpacity>
         </View>
       </View>
       <Modal 
@@ -79,12 +88,12 @@ const handleSubmit = async({email,password}) => {
       >
         <View style={style.modalStyle}>
           <View style={style.modalCartel}>
-            <Text style={[style.modalTextMessage]}>You have to fill all the fields</Text>
+            <Text style={style.modalTextMessage}>You have to fill all the fields</Text>
             <TouchableOpacity 
             style={style.okButton}
             onPress={()=>setModalState(false)}
             >
-              <Text style={[style.okButtonText, style.textColorStyle]}>OK</Text>
+              <Text style={style.okButtonText}>OK</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -102,7 +111,7 @@ const style = StyleSheet.create({
 
   },
   loginForm:{
-    height:'40%',
+    height:'70%',
     width:'90%',
     borderRadius:10
   },
@@ -114,13 +123,13 @@ const style = StyleSheet.create({
   },
   titleText:{
     fontSize:30,
-    },
-  textColorStyle:{
     fontWeight:'bold',
     color:'white',
-  },
+    },
   inputTitleTextStyle:{
-    fontSize:20
+    fontSize:20,
+    fontWeight:'bold',
+    color:'white',
   },
   inputView:{
     marginBottom:7
@@ -139,23 +148,20 @@ const style = StyleSheet.create({
     paddingHorizontal:4,
     paddingTop:4,
     borderTopWidth:1,
-    borderTopColor:'white'
+    borderTopColor:'white',
   },
   submitButton:{
     backgroundColor:'white',
-    width:'30%',
-    paddingVertical:8,
     borderRadius:5,
+    justifyContent:'center',
+    paddingVertical:4,
+    marginVertical:34
   },
   submitButtonText:{
     alignSelf:'center',
     color:'#374FC6',
-    fontSize:20
-  },
-  buttonsView:{
-    alignItems: 'center',
-    marginTop:10,
-    flexDirection:'row'
+    fontSize:23,
+    fontWeight:'bold',
   },
   modalStyle:{
     flex:1,
@@ -189,31 +195,22 @@ const style = StyleSheet.create({
   okButtonText:{
     alignSelf:'center',
     color:'white',
-    fontSize:20
+    fontSize:20,
+    fontWeight:'bold',
+    color:'white',
   },
-  fingerPrintButton:{
+  toRegisterLink:{
     backgroundColor:'white',
-    width:'65%',
-    paddingVertical:10,
     borderRadius:5,
-    paddingHorizontal:5,
-    marginRight:15,
-    flexDirection:'row'
+    justifyContent:'center',
+    paddingVertical:4,
+    marginTop:10
   },
-  fingerPrintText:{
+  toRegisterLinkText:{
     alignSelf:'center',
     color:'#374FC6',
-    fontSize:13
-  },
-  fingerprintButtonView:{
-    alignItems: 'flex-end',
-    marginTop:12,
-    borderWidth:1
-  },
-  fingerSVG:{
-    height:'42%',
-    flex:1,
-    marginLeft:2
+    fontSize:23,
+    fontWeight:'bold',
   }
 })
 
