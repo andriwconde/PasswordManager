@@ -1,12 +1,14 @@
 import React,{useState, useEffect} from 'react';
 import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal} from 'react-native'
+import { useDispatch, useSelector } from 'react-redux';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import BiometricPopUp from '../components/BiometricPopUp';
 import { setLogin } from '../redux/slices/LoginSlice';
 import {Divider} from '../components/Divider';
 
 const HomeScreen = ({navigation})  => {
-  
+  const dispatch = useDispatch()
+  const login = useSelector(state=>state)
   const [modalState, setModalState] = useState(false)
   const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
   const [fingerPrintButton,setFingerprintButton]=useState(false)
@@ -26,13 +28,16 @@ useEffect(() => {
 
 },[])
 
+useEffect(()=>{
+  console.log(login)
+},[login])
 
 const handleInput =(input,value)=>{
   setFormValues({...formValues,[input]:value})
 }
 const handleSubmit = async({email,password}) => {
-  (email === "" || password === "") && setModalState(true)
-  setLogin(formValues)
+  (email === "" || password === "") ? setModalState(true):
+  dispatch(setLogin())
 }
 
 

@@ -1,14 +1,14 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, } from '@reduxjs/toolkit';
 import loginWS from '../../networking/endpoint/loginWS';
 
 const initialState ={
-    login:0
+    loginValue:0
 }
 const loginSlice = createSlice({
     name:'Login',
     initialState,
     reducers:{
-        setLogin:(state)=> state.login ++
+        setLogin:(state)=> {state.loginValue++;}
     }
     
 })
