@@ -28,7 +28,7 @@ return (
             placeholder='john'
             onChangeText={(value)=>handleInput('name',value)}
             autoComplete='name'
-            placeholderTextColor='#C7C7C7'
+            placeholderTextColor='#ACACAC'
           />
         </View>
         <View style={style.inputView}>
@@ -38,7 +38,7 @@ return (
             placeholder='Doe'
             onChangeText={(value)=>handleInput('surname',value)}
             autoComplete='name-middle'
-            placeholderTextColor='#C7C7C7'
+            placeholderTextColor='#ACACAC'
           />
         </View>
         <View style={style.inputView}>
@@ -48,7 +48,7 @@ return (
             placeholder='example@mail.com'
             onChangeText={(value)=>handleInput('email',value)}
             autoComplete='email'
-            placeholderTextColor='#C7C7C7'
+            placeholderTextColor='#ACACAC'
           />
         </View>
         <View style={style.inputView}>
@@ -58,7 +58,7 @@ return (
           secureTextEntry={true}
           onChangeText={(value)=>handleInput('password',value)}
           placeholder='one-secure-password'
-          placeholderTextColor='#C7C7C7'
+          placeholderTextColor='#ACACAC'
           />
         </View>
         <TouchableOpacity 
@@ -78,7 +78,7 @@ const style = StyleSheet.create({
         flex:1,
         alignItems:'center',
         justifyContent:'center',
-        backgroundColor: '#374FC6',
+        backgroundColor: '#4996FA',
     
       },
       loginForm:{

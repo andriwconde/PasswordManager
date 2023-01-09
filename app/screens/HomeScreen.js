@@ -3,12 +3,12 @@ import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal} from
 import { useDispatch, useSelector } from 'react-redux';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import BiometricPopUp from '../components/BiometricPopUp';
-import { setLogin } from '../redux/slices/LoginSlice';
+import {appVersion} from '../redux/slices/userSlice'
 import {Divider} from '../components/Divider';
 
 const HomeScreen = ({navigation})  => {
   const dispatch = useDispatch()
-  const login = useSelector(state=>state)
+  const version = useSelector(state => state)
   const [modalState, setModalState] = useState(false)
   const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
   const [fingerPrintButton,setFingerprintButton]=useState(false)
@@ -28,16 +28,17 @@ useEffect(() => {
 
 },[])
 
-useEffect(()=>{
-  console.log(login)
-},[login])
+useEffect(() => {
+  console.log(version)
+},[version])
+
 
 const handleInput =(input,value)=>{
   setFormValues({...formValues,[input]:value})
 }
 const handleSubmit = async({email,password}) => {
   (email === "" || password === "") ? setModalState(true):
-  dispatch(setLogin())
+dispatch(appVersion())
 }
 
 
@@ -58,7 +59,7 @@ const handleSubmit = async({email,password}) => {
               placeholder='example@mail.com'
               onChangeText={(value)=>handleInput('email',value)}
               autoComplete='email'
-              placeholderTextColor='#C7C7C7'
+              placeholderTextColor='#ACACAC'
             />
           </View>
           <View style={style.inputView}>
@@ -66,7 +67,7 @@ const handleSubmit = async({email,password}) => {
             <TextInput 
             style={style.inputStyles} 
             placeholder='one-secure-password'
-            placeholderTextColor='#C7C7C7'
+            placeholderTextColor='#ACACAC'
             secureTextEntry={true}
             onChangeText={(value)=>handleInput('password',value)}
             />
@@ -112,7 +113,7 @@ const style = StyleSheet.create({
     flex:1,
     alignItems:'center',
     justifyContent:'center',
-    backgroundColor: '#374FC6',
+    backgroundColor: '#4996FA',
 
   },
   loginForm:{

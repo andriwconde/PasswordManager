@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import FingerprintIcon from '../assets/images/icons/fingerprintIcon.svg'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import { setLogin } from '../redux/slices/LoginSlice';
+import { setLogin } from '../redux/slices/ErrorSlice';
 
 const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
   const login = useSelector(state => state.login)
