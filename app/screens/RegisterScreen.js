@@ -1,8 +1,11 @@
-import React,{useState} from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import React,{useEffect, useState} from "react";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { userRegister } from '../redux/slices/userSlice'
 
 const RegisterScreen =({navigation})=>{
-
+  const dispatch = useDispatch()
+  const registered = useSelector(state=>state.registered)
   const [formValues,setFormValues] = useState({
     name:'',
     surname:'',
@@ -10,8 +13,22 @@ const RegisterScreen =({navigation})=>{
     password:''
   })
 
+  useEffect(() => {
+
+  },[registered])
+
   const handleInput =(input,value)=>{
     setFormValues({...formValues,[input]:value})
+  }
+
+  const handleSubmit = (formValues) => {
+    dispatch(userRegister(formValues)).then(res=>{
+      if(res.payload.data){
+        Alert.alert('registro exitoso')
+        navigation.navigate('Login')
+      }
+    })
+
   }
 
 return (

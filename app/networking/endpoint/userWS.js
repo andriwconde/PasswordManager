@@ -5,7 +5,7 @@ export default userWS = {
         return await axios.post('/login', userCred);
     },
     register: async function (userCred) {
-        return await axios.post('/login',userCred);
+        return await axios.post('/register',userCred);
     },
     version: async function () {
         return await axios.get('/version');

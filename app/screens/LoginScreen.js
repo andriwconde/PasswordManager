@@ -1,14 +1,14 @@
-import React,{useState, useEffect} from 'react';
-import {View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal} from 'react-native'
+import React,{ useState, useEffect } from 'react';
+import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import BiometricPopUp from '../components/BiometricPopUp';
-import {appVersion} from '../redux/slices/userSlice'
-import {Divider} from '../components/Divider';
+import { userLogin } from '../redux/slices/userSlice';
+import { Divider } from '../components/Divider';
 
-const HomeScreen = ({navigation})  => {
+const LoginScreen = ({navigation})  => {
   const dispatch = useDispatch()
-  const version = useSelector(state => state)
+  const loggedUser = useSelector(state => state.loggedUser)
   const [modalState, setModalState] = useState(false)
   const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
   const [fingerPrintButton,setFingerprintButton]=useState(false)
@@ -29,16 +29,24 @@ useEffect(() => {
 },[])
 
 useEffect(() => {
-  console.log(version)
-},[version])
-
+  if(loggedUser){
+    Alert.alert('Login Succesful')
+  }
+},[loggedUser])
 
 const handleInput =(input,value)=>{
   setFormValues({...formValues,[input]:value})
 }
 const handleSubmit = async({email,password}) => {
   (email === "" || password === "") ? setModalState(true):
-dispatch(appVersion())
+dispatch(userLogin(formValues)).then(res=>{
+  if(res.payload.data.split(' ')[0] === 'Welcome'){
+    Alert.alert('Welcome',res.payload.data.split(' ')[1])
+    navigation.navigate('Start')
+  }else if(res.payload.data.split(' ')[0] === 'username'){
+    Alert.alert(res.payload.data)
+  }
+})
 }
 
 
@@ -220,4 +228,4 @@ const style = StyleSheet.create({
   }
 })
 
-export default HomeScreen;
+export default LoginScreen;
