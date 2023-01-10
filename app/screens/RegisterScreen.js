@@ -2,10 +2,12 @@ import React,{useEffect, useState} from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { userRegister } from '../redux/slices/userSlice'
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const RegisterScreen =({navigation})=>{
   const dispatch = useDispatch()
   const registered = useSelector(state=>state.registered)
+  const [visibility, setVisibility]= useState(false)
   const [formValues,setFormValues] = useState({
     name:'',
     surname:'',
@@ -21,11 +23,18 @@ const RegisterScreen =({navigation})=>{
     setFormValues({...formValues,[input]:value})
   }
 
+  const handleVisibility=()=>{
+    setVisibility(!visibility)
+  }
+
   const handleSubmit = (formValues) => {
     dispatch(userRegister(formValues)).then(res=>{
+      console.log(res.payload)
       if(res.payload.data){
         Alert.alert('registro exitoso')
         navigation.navigate('Login')
+      }else if(res.payload.status === 'error'){
+        Number(res.payload.code) === 11000 && Alert.alert('E-mail no disponible')
       }
     })
 
@@ -70,13 +79,28 @@ return (
         </View>
         <View style={style.inputView}>
           <Text style={style.inputTitleTextStyle}>Password:</Text>
-          <TextInput 
-          style={style.inputStyles} 
-          secureTextEntry={true}
-          onChangeText={(value)=>handleInput('password',value)}
-          placeholder='one-secure-password'
-          placeholderTextColor='#ACACAC'
-          />
+          <View >
+              <TextInput 
+              style={style.inputStyles}
+              placeholder='one-secure-password'
+              placeholderTextColor='#ACACAC'
+              secureTextEntry={!visibility}
+              onChangeText={(value)=>handleInput('password',value)}
+              />
+              {!visibility ? <TouchableOpacity
+              onPress={()=>handleVisibility()}
+              style={style.visibilityIcon}
+              >
+                <Icon name='visibility' size={35} color="#ACACAC" />
+              </TouchableOpacity>:
+              <TouchableOpacity
+              onPress={()=>handleVisibility()}
+              style={style.visibilityIcon}
+              >
+                <Icon name='visibility-off' size={35} color="#ACACAC" />
+              </TouchableOpacity>
+              }
+            </View>
         </View>
         <TouchableOpacity 
           style={style.submitButton}
@@ -217,6 +241,12 @@ const style = StyleSheet.create({
         height:'42%',
         flex:1,
         marginLeft:2
-      }
+      },
+      visibilityIcon:{
+        alignSelf:'flex-end',
+        position:'absolute',
+        marginTop:4,
+        paddingRight:10
+      },
 })
 export default RegisterScreen

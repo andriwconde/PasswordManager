@@ -65,7 +65,7 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
       <Text style={[styles.textColorStyle, styles.fingerPrintText]}>
         Fingerprint  Autentication
       </Text>
-      <View style={styles.fingerSVG}>
+      <View>
         <Icon name='fingerprint' size={40} color="black" />
       </View>
     </TouchableOpacity>

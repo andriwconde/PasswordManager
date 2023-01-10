@@ -1,6 +1,7 @@
 import React,{ useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import BiometricPopUp from '../components/BiometricPopUp';
 import { userLogin } from '../redux/slices/userSlice';
@@ -9,6 +10,7 @@ import { Divider } from '../components/Divider';
 const LoginScreen = ({navigation})  => {
   const dispatch = useDispatch()
   const loggedUser = useSelector(state => state.loggedUser)
+  const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
   const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
   const [fingerPrintButton,setFingerprintButton]=useState(false)
@@ -33,6 +35,10 @@ useEffect(() => {
     Alert.alert('Login Succesful')
   }
 },[loggedUser])
+
+const handleVisibility=()=>{
+  setVisibility(!visibility)
+}
 
 const handleInput =(input,value)=>{
   setFormValues({...formValues,[input]:value})
@@ -72,13 +78,29 @@ dispatch(userLogin(formValues)).then(res=>{
           </View>
           <View style={style.inputView}>
             <Text style={style.inputTitleTextStyle}>Password:</Text>
-            <TextInput 
-            style={style.inputStyles} 
-            placeholder='one-secure-password'
-            placeholderTextColor='#ACACAC'
-            secureTextEntry={true}
-            onChangeText={(value)=>handleInput('password',value)}
-            />
+            <View >
+              <TextInput 
+              style={style.inputStyles}
+              placeholder='one-secure-password'
+              placeholderTextColor='#ACACAC'
+              secureTextEntry={!visibility}
+              onChangeText={(value)=>handleInput('password',value)}
+              />
+              {!visibility ? <TouchableOpacity
+              onPress={()=>handleVisibility()}
+              style={style.visibilityIcon}
+              >
+                <Icon name='visibility' size={35} color="#ACACAC" />
+              </TouchableOpacity>:
+              <TouchableOpacity
+              onPress={()=>handleVisibility()}
+              style={style.visibilityIcon}
+              >
+                <Icon name='visibility-off' size={35} color="#ACACAC" />
+              </TouchableOpacity>
+              }
+            </View>
+
           </View>
           <TouchableOpacity 
             style={style.submitButton}
@@ -225,7 +247,14 @@ const style = StyleSheet.create({
     color:'#374FC6',
     fontSize:23,
     fontWeight:'bold',
-  }
+  },
+  visibilityIcon:{
+    alignSelf:'flex-end',
+    position:'absolute',
+    marginTop:4,
+    paddingRight:10
+  },
+
 })
 
 export default LoginScreen;
