@@ -1,7 +1,6 @@
 import {StyleSheet, Text, View, TouchableOpacity, Platform, Alert} from 'react-native';
 import React, {useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import FingerprintIcon from '../assets/images/icons/fingerprintIcon.svg'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { setLogin } from '../redux/slices/ErrorSlice';
