@@ -14,8 +14,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-TestingProyect-TestingProyectTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-TestingProyect-TestingProyectTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		D8663887296DE1F5009142AA /* libreact-native-fingerprint-scanner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D8663886296DE1F5009142AA /* libreact-native-fingerprint-scanner.a */; };
 		D87983E02922B4A600CE2FCE /* hermes.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D87983DF2922B4A500CE2FCE /* hermes.xcframework */; };
+		D88C504E297393120083E482 /* TestingProyectTests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = 00E356EE1AD99517003FC87E /* TestingProyectTests.xctest */; };
+		D88C504F2973932B0083E482 /* TestingProyectTests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = 00E356EE1AD99517003FC87E /* TestingProyectTests.xctest */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,13 +26,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = TestingProyect;
-		};
-		D8663884296DE141009142AA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D8663880296DE141009142AA /* ReactNativeFingerprintScanner.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = ReactNativeFingerprintScanner;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -52,7 +46,6 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-TestingProyect.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TestingProyect.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = TestingProyect/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-TestingProyect-TestingProyectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestingProyect-TestingProyectTests.release.xcconfig"; path = "Target Support Files/Pods-TestingProyect-TestingProyectTests/Pods-TestingProyect-TestingProyectTests.release.xcconfig"; sourceTree = "<group>"; };
-		D8663880296DE141009142AA /* ReactNativeFingerprintScanner.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeFingerprintScanner.xcodeproj; path = "../node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.xcodeproj"; sourceTree = "<group>"; };
 		D8663886296DE1F5009142AA /* libreact-native-fingerprint-scanner.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libreact-native-fingerprint-scanner.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D87983DF2922B4A500CE2FCE /* hermes.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = hermes.xcframework; path = "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -71,7 +64,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D8663887296DE1F5009142AA /* libreact-native-fingerprint-scanner.a in Frameworks */,
 				0C80B921A6F3F58F76C31292 /* libPods-TestingProyect.a in Frameworks */,
 				D87983E02922B4A600CE2FCE /* hermes.xcframework in Frameworks */,
 			);
@@ -123,19 +115,10 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				D8663880296DE141009142AA /* ReactNativeFingerprintScanner.xcodeproj */,
-			);
-			name = Libraries;
-			sourceTree = "<group>";
-		};
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
 				13B07FAE1A68108700A75B9A /* TestingProyect */,
-				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* TestingProyectTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
@@ -164,14 +147,6 @@
 				89C6BE57DB24E9ADA2F236DE /* Pods-TestingProyect-TestingProyectTests.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		D8663881296DE141009142AA /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D8663885296DE141009142AA /* libReactNativeFingerprintScanner.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		D8757CC6296DDD6F00AA6EA0 /* Fonts */ = {
@@ -255,12 +230,6 @@
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = D8663881296DE141009142AA /* Products */;
-					ProjectRef = D8663880296DE141009142AA /* ReactNativeFingerprintScanner.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* TestingProyect */,
@@ -269,21 +238,12 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXReferenceProxy section */
-		D8663885296DE141009142AA /* libReactNativeFingerprintScanner.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libReactNativeFingerprintScanner.a;
-			remoteRef = D8663884296DE141009142AA /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
-
 /* Begin PBXResourcesBuildPhase section */
 		00E356EC1AD99517003FC87E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D88C504F2973932B0083E482 /* TestingProyectTests.xctest in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,6 +253,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				D88C504E297393120083E482 /* TestingProyectTests.xctest in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
