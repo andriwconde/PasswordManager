@@ -90,7 +90,7 @@ dispatch(userLogin(formValues)).then(res=>{
               onPress={()=>handleVisibility()}
               style={style.visibilityIcon}
               >
-                {/* <Icon name='visibility' size={35} color="#ACACAC" /> */}
+                <Icon name='visibility' size={35} color="#ACACAC" />
               </TouchableOpacity>:
               <TouchableOpacity
               onPress={()=>handleVisibility()}

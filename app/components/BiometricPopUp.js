@@ -82,7 +82,7 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp, biometricType}) 
         Fingerprint  Autentication
       </Text>
       <View>
-        {/* <Icon name='fingerprint' size={40} color="black" /> */}
+        <Icon name='fingerprint' size={40} color="black" />
       </View>
     </TouchableOpacity>
   );
