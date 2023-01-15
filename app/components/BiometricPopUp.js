@@ -1,13 +1,9 @@
 import {StyleSheet, Text, View, TouchableOpacity, Platform, Alert} from 'react-native';
 import React, {useEffect} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import { setLogin } from '../redux/slices/ErrorSlice';
 
-const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
-  const login = useSelector(state => state.login)
-  const dispatch = useDispatch()
+const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp, biometricType}) => {
   
   useEffect(() => {
     if (requiresLegacyAuthentication()) {
@@ -25,7 +21,7 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
   };
 
   const authCurrent = async () => {
-    FingerprintScanner.authenticate({
+    biometricType === 'Biometrics' ? FingerprintScanner.authenticate({
       title: 'Log in with Biometrics',
       cancelButton: 'atras',
     })
@@ -36,24 +32,45 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
       })
       .catch((err) => {
         setFingerprintPopUp(false)       
-      });
+      })
+      :
+
+    (biometricType === 'Face ID' || biometricType === 'Touch ID') && FingerprintScanner
+      .authenticate({ description: 'Scan your fingerprint on the device scanner to continue' })
+      .then(() => {
+        console.log('autenticado')
+        AlertIOS.alert('Authenticated successfully');
+      })
+      .catch((error) => {
+        AlertIOS.alert(error.message);
+    });
+
   }
 
   const authLegacy = () => {
-    FingerprintScanner.authenticate({
-      onAttempt: this.handleAuthenticationAttemptedLegacy,
+    biometricType === 'Biometrics' ? FingerprintScanner.authenticate({
+      title: 'Log in with Biometrics',
+      cancelButton: 'atras',
     })
       .then(() => {
-        this.props.handlePopupDismissedLegacy();
         Alert.alert('Fingerprint Authentication', 'Authenticated successfully');
+        console.log('holaas')
+        setFingerprintPopUp(false)
       })
-      .catch(error => {
-        this.setState({
-          errorMessageLegacy: error.message,
-          biometricLegacy: error.biometric,
-        });
-        this.description.shake();
-      });
+      .catch((err) => {
+        setFingerprintPopUp(false)       
+      })
+      :
+
+    (biometricType === 'Face ID' || biometricType === 'Touch ID') && FingerprintScanner
+      .authenticate({ description: 'Scan your fingerprint on the device scanner to continue' })
+      .then(() => {
+        console.log('autenticado')
+        Alert.alert('Authenticated successfully');
+      })
+      .catch((error) => {
+        Alert.alert(error.message);   
+    });
   };
 
 
@@ -65,7 +82,7 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
         Fingerprint  Autentication
       </Text>
       <View>
-        <Icon name='fingerprint' size={40} color="black" />
+        {/* <Icon name='fingerprint' size={40} color="black" /> */}
       </View>
     </TouchableOpacity>
   );

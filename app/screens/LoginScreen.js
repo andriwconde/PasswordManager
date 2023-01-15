@@ -10,6 +10,7 @@ import { Divider } from '../components/Divider';
 const LoginScreen = ({navigation})  => {
   const dispatch = useDispatch()
   const loggedUser = useSelector(state => state.loggedUser)
+  const [biometricType,setBiometricType]=useState(null)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
   const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
@@ -20,14 +21,13 @@ const LoginScreen = ({navigation})  => {
   })
 
 useEffect(() => {
-
   FingerprintScanner
     .isSensorAvailable()
-    .then(biometryType => {
-      biometryType && setFingerprintButton(true)
+    .then(biometric => {
+      console.log(biometric)
+      biometric && (setFingerprintButton(true),setBiometricType(biometric))
     })
-    .catch(error => console.log(error)); 
-
+    .catch(error => console.log(error));
 },[])
 
 useEffect(() => {
@@ -60,7 +60,7 @@ dispatch(userLogin(formValues)).then(res=>{
     <View style={style.backgroundView}>
       <View style={style.loginForm}>
       {fingerPrintButton && 
-              <BiometricPopUp fingerprintPopUp={fingerprintPopUp} setFingerprintPopUp={setFingerprintPopUp}/>
+              <BiometricPopUp fingerprintPopUp={fingerprintPopUp} setFingerprintPopUp={setFingerprintPopUp} biometricType={biometricType}/>
             }
         <View style={style.loginTitle}>
           <Text style={style.titleText}>Login</Text>
@@ -90,7 +90,7 @@ dispatch(userLogin(formValues)).then(res=>{
               onPress={()=>handleVisibility()}
               style={style.visibilityIcon}
               >
-                <Icon name='visibility' size={35} color="#ACACAC" />
+                {/* <Icon name='visibility' size={35} color="#ACACAC" /> */}
               </TouchableOpacity>:
               <TouchableOpacity
               onPress={()=>handleVisibility()}
