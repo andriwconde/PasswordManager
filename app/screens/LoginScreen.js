@@ -16,7 +16,8 @@ const LoginScreen = ({navigation})  => {
   const [fingerPrintButton,setFingerprintButton]=useState(false)
   const [formValues,setFormValues] = useState({
     email:'',
-    password:''
+    password:'',
+    bioAuth: false
   })
 
 useEffect(() => {
@@ -45,14 +46,7 @@ const handleInput =(input,value)=>{
 }
 const handleSubmit = async({email,password}) => {
   (email === "" || password === "") ? setModalState(true):
-dispatch(userLogin(formValues)).then(res=>{
-  if(res.payload.data.split(' ')[0] === 'Welcome'){
-    Alert.alert('Welcome',res.payload.data.split(' ')[1])
-    navigation.navigate('Start')
-  }else if(res.payload.data.split(' ')[0] === 'username'){
-    Alert.alert(res.payload.data)
-  }
-})
+dispatch(userLogin({formValues,navigation}))
 }
 
 
@@ -60,7 +54,7 @@ dispatch(userLogin(formValues)).then(res=>{
     <View style={style.backgroundView}>
       <View style={style.loginForm}>
       {fingerPrintButton && 
-              <BiometricPopUp fingerprintPopUp={fingerprintPopUp} setFingerprintPopUp={setFingerprintPopUp}/>
+              <BiometricPopUp fingerprintPopUp={fingerprintPopUp} setFingerprintPopUp={setFingerprintPopUp} navigation={navigation}/>
             }
         <View style={style.loginTitle}>
           <Text style={style.titleText}>Login</Text>

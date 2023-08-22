@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import  userWS  from '../../networking/endpoint/userWS'
+import * as Keychain from 'react-native-keychain';
+import config from '../../config/config';
+import { Alert } from 'react-native';
 
 const initialState = {
   loading: 'idle',
@@ -11,9 +14,16 @@ const initialState = {
 
 export const userLogin = createAsyncThunk(
     'users/login',
-    async (userCred) => {
+    async ({formValues, navigation}) => {
       try{
-        const response = await userWS.login(userCred)
+        const response = await userWS.login(formValues)
+        if(response.data.status === 'error'){
+          Alert.alert('error',response.data.message)
+        }else if(response.data.status === 'success'){
+          Alert.alert(`Welcome ${response.data.data.user.name}` ,)
+          const keychainRes = await Keychain.setGenericPassword(formValues.email, formValues.password);
+          navigation.navigate('Start')
+        }
         return response.data
       }catch(err){
         console.log(err)

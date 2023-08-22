@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { setLogin } from '../redux/slices/ErrorSlice';
 
-const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
+const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp, navigation}) => {
   const login = useSelector(state => state.login)
   const dispatch = useDispatch()
   
@@ -31,7 +31,7 @@ const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp}) => {
     })
       .then(() => {
         Alert.alert('Fingerprint Authentication', 'Authenticated successfully');
-        console.log('holaas')
+        navigation.navigate('Start')
         setFingerprintPopUp(false)
       })
       .catch((err) => {
