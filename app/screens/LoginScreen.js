@@ -10,6 +10,7 @@ import { Divider } from '../components/Divider';
 const LoginScreen = ({navigation})  => {
   const dispatch = useDispatch()
   const loggedUser = useSelector(state => state.loggedUser)
+  const [biometricType,setBiometricType]=useState(null)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
   const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
@@ -21,14 +22,13 @@ const LoginScreen = ({navigation})  => {
   })
 
 useEffect(() => {
-
   FingerprintScanner
     .isSensorAvailable()
-    .then(biometryType => {
-      biometryType && setFingerprintButton(true)
+    .then(biometric => {
+      console.log(biometric)
+      biometric && (setFingerprintButton(true),setBiometricType(biometric))
     })
-    .catch(error => console.log(error)); 
-
+    .catch(error => console.log(error));
 },[])
 
 useEffect(() => {
