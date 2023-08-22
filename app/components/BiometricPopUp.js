@@ -1,11 +1,9 @@
 import {StyleSheet, Text, View, TouchableOpacity, Platform, Alert} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect,useSelector} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 const BiometricPopUp = ({fingerprintPopUp, setFingerprintPopUp, navigation}) => {
-  const login = useSelector(state => state.login)
-  const dispatch = useDispatch()
   
   useEffect(() => {
     if (requiresLegacyAuthentication()) {

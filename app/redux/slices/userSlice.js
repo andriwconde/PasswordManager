@@ -20,7 +20,9 @@ export const userLogin = createAsyncThunk(
         if(response.data.status === 'error'){
           Alert.alert('error',response.data.message)
         }else if(response.data.status === 'success'){
-          Alert.alert(`Welcome ${response.data.data.user.name}` ,)
+          Alert.alert(`Welcome ${response.data.data.user.name}`)
+          console.log({formValues})
+          await Keychain.resetGenericPassword();
           const keychainRes = await Keychain.setGenericPassword(formValues.email, formValues.password);
           navigation.navigate('Start')
         }
