@@ -1,54 +1,80 @@
 import React,{ useState, useEffect } from 'react';
-import {View, Text, StyleSheet, _View} from 'react-native'
-import FingerprintScanner from 'react-native-fingerprint-scanner';
-import BiometricPopUp from '../components/BiometricPopUp';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native'
 import CheckBox from '@react-native-community/checkbox';
-import * as Keychain from 'react-native-keychain';
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 const StartScreen = ({navigation}) => {
-    const [fingerprintPopUp,setFingerprintPopUp]=useState(false)
-    const [fingerPrintButton,setFingerprintButton]=useState(false)
+    const [showCheckbox,setShowCheckbox]=useState(false)
     const [toggleCheckBox, setToggleCheckBox] = useState(false)
 
-    useEffect(() => {
+useEffect(() => {
+    hasBioAuthSensor()
+    hasUserId()
+    //deleteKeys()
+},[])
 
-        FingerprintScanner
-          .isSensorAvailable()
-          .then(biometryType => {
-            biometryType && setFingerprintButton(true)
-          })
-          .catch(error => console.log(error)); 
-      
-      },[])
-    
-    const checkBoxOnhange = async(newValue)=>{
-        setToggleCheckBox(newValue)
-        if(newValue){
-            const getCredentials = await Keychain.getGenericPassword();
-            getCredentials.bioAuth = true
-            console.log({getCredentials})
-            dispatch(userLogin({getCredentials,navigation}))
-        }
+useEffect(() => {
+    if(toggleCheckBox){
+        navigation.navigate('BiometricEnrollment');
     }
+},[toggleCheckBox,showCheckbox])
+
+const deleteKeys = async() =>{
+    try{
+      const { keysDeleted } = await rnBiometrics.deleteKeys()
+      console.log({keysDeleted})
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  const hasUserId = async()=>{
+    try{
+        const userId = await EncryptedStorage.getItem('userId')
+        console.log({userId})
+    }catch(err){
+        console.log(err)
+    }
+    
+  }
+
+const hasBioAuthSensor = async () => {
+    const rnBiometrics = new ReactNativeBiometrics()
+    try{
+        const {available, biometryType} = await rnBiometrics.isSensorAvailable()
+        const { keysExist } = await rnBiometrics.biometricKeysExist()
+        console.log({available, keysExist})
+        if(available && !keysExist){
+            setShowCheckbox(true)
+        }else{
+            setShowCheckbox(false)
+        }
+    }catch(error){
+        console.log(error)
+    }
+}
+    
+const checkBoxOnhange = async(newValue)=>{
+    setToggleCheckBox(newValue)
+}
 
     return (
         <View style={style.backgroundView}>
             <Text style={style.titleText}>Welcome</Text>
-            {fingerPrintButton && 
-                <View style={style.bioAuthCheckbox}>
+            {showCheckbox && 
+                <TouchableOpacity style={style.bioAuthCheckbox} onPress={()=>checkBoxOnhange(!toggleCheckBox)}>
                     <CheckBox
                         disabled={false}
                         value={toggleCheckBox}
                         onValueChange={checkBoxOnhange}
                     />
                     <Text style={style.bioAuthCheckboxText}>Enable biometric authentication</Text>
-                </View>
+                </TouchableOpacity>
             }
         </View>
     );
 }
-
-export default StartScreen;
 
 const style = StyleSheet.create({
     backgroundView:{
@@ -73,3 +99,5 @@ const style = StyleSheet.create({
         justifyContent:'center',
     }
 })
+
+export default StartScreen;

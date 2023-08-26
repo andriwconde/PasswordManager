@@ -1,13 +1,14 @@
 import React,{useEffect, useState} from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Modal } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { userRegister } from '../redux/slices/userSlice'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const RegisterScreen =({navigation})=>{
   const dispatch = useDispatch()
-  const registered = useSelector(state=>state.registered)
+  const registered = useSelector(state=>state.user.registered)
   const [visibility, setVisibility]= useState(false)
+  const [modalState, setModalState] = useState(false)
   const [formValues,setFormValues] = useState({
     name:'',
     surname:'',
@@ -16,7 +17,9 @@ const RegisterScreen =({navigation})=>{
   })
 
   useEffect(() => {
-
+    if(registered){
+      navigation.navigate('Login')
+    }
   },[registered])
 
   const handleInput =(input,value)=>{
@@ -27,17 +30,13 @@ const RegisterScreen =({navigation})=>{
     setVisibility(!visibility)
   }
 
-  const handleSubmit = (formValues) => {
-    dispatch(userRegister(formValues)).then(res=>{
-      console.log(res.payload)
-      if(res.payload.data){
-        Alert.alert('registro exitoso')
-        navigation.navigate('Login')
-      }else if(res.payload.status === 'error'){
-        Number(res.payload.code) === 11000 && Alert.alert('E-mail no disponible')
-      }
-    })
-
+  const handleSubmit = async () => {
+    const {name, surname, email,password} = formValues
+    if(email === null || password === null|| name === null || surname === null) {
+     setModalState(true);
+   } else{
+    dispatch(userRegister(formValues))
+   }
   }
 
 return (
@@ -104,12 +103,29 @@ return (
         </View>
         <TouchableOpacity 
           style={style.submitButton}
-          onPress={()=>handleSubmit(formValues)}
+          onPress={handleSubmit}
           >
           <Text style={style.submitButtonText}>Register</Text>
         </TouchableOpacity>
       </View>
     </View>
+    <Modal 
+        animationType="fade"
+        transparent={true}
+        visible={modalState}
+      >
+        <View style={style.modalStyle}>
+          <View style={style.modalCartel}>
+            <Text style={style.modalTextMessage}>You have to fill all the fields</Text>
+            <TouchableOpacity 
+            style={style.okButton}
+            onPress={()=>setModalState(false)}
+            >
+              <Text style={style.okButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
   </View>
 );
 }

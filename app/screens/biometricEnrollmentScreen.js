@@ -3,14 +3,12 @@ import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal, Ale
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
-import { userLogin, userBioLogin, setRegisteredStateFalse } from '../redux/slices/userSlice';
-import { Divider } from '../components/Divider';
-import EncryptedStorage from 'react-native-encrypted-storage';
+import { userLogin } from '../redux/slices/userSlice';
 
-const LoginScreen = ({navigation})  => {
+const BiometricEnrollmentScreen = ({navigation})  => {
   const dispatch = useDispatch()
+  const rnBiometrics = new ReactNativeBiometrics();
   const loggedUser = useSelector(state => state.user.loggedUser)
-  const registered = useSelector(state => state.user.registered)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
   const [formValues,setFormValues] = useState({
@@ -19,76 +17,53 @@ const LoginScreen = ({navigation})  => {
     publicKey: null
   })
 
-useEffect(() => {
-  hasBioAuthSensor()
-},[])
-
-useEffect(()=>{
-if(registered){
-  console.log('hola')
-  dispatch(setRegisteredStateFalse())
-}
-},[registered])
-
-useEffect(() => {
-  console.log(loggedUser)
-  if(loggedUser?.user?.name){
-    navigation.navigate('Start')
-  }
-},[loggedUser])
-
-
-const handleVisibility=()=>{
-  setVisibility(!visibility)
-}
-
-const hasBioAuthSensor = async () => {
-  const rnBiometrics = new ReactNativeBiometrics()
-  try{
-    const {available, biometryType} = await rnBiometrics.isSensorAvailable()
-    if(available){
-      const { keysExist } = await rnBiometrics.biometricKeysExist()
-      if (keysExist){
-        const epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
-        const userId = await EncryptedStorage.getItem('userId')
-        const payload = `${epochTimeSeconds}__${userId}`
-        const { success, signature } = await rnBiometrics.createSignature({
-          promptMessage: 'Sign in',
-          payload
-        })
-        if(success){
-          const signatureId = {payload,signature}
-          dispatch(userBioLogin(signatureId))
-        }
-
-      }else{
-        console.log('Keys do not exist or were deleted')
-      }
+  useEffect(() => {
+    if(loggedUser?.user.publickey){
+      navigation.navigate('Start')
     }
+  },[loggedUser])
+
+  useEffect(() => {
+    //deleteKeys()
+  },[])
+
+const deleteKeys = async() =>{
+  try{
+    const { keysDeleted } = await rnBiometrics.deleteKeys()
+    console.log({keysDeleted})
   }catch(err){
     console.log(err)
   }
 }
 
+const handleVisibility=()=>{
+  setVisibility(!visibility)
+}
+
 const handleInput =(input,value)=>{
   setFormValues({...formValues,[input]:value})
 }
-const handleSubmit = async () => {
-  console.log('----hola')
-  const {email,password} = formValues
- if(email === null || password === null) {
-  setModalState(true);
-} else{
-  dispatch(userLogin(formValues));
-}
+
+const handleSubmit = async() => {
+    try{
+      const { success } = await rnBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
+      if(success){
+        const { publicKey }  = await rnBiometrics.createKeys()
+        const valuesWithKey ={...formValues,publicKey}
+        dispatch(userLogin(valuesWithKey))
+        console.log({valuesWithKey})
+      }
+    }catch(err){
+      console.log({err})
+    }
 }
 
 
   return (
     <View style={style.backgroundView}>
       <View style={style.loginForm}>
-        <View style={style.loginTitle}>
-          <Text style={style.titleText}>Login</Text>
+      <View style={style.loginTitle}>
+          <Text style={style.titleText}>Biometric Enrollment</Text>
         </View>
         <View style={style.inputsView}>
           <View style={style.inputView}>
@@ -129,16 +104,9 @@ const handleSubmit = async () => {
           </View>
           <TouchableOpacity 
             style={style.submitButton}
-            onPress={handleSubmit}
+            onPress={async()=>handleSubmit(formValues)}
             >
             <Text style={style.submitButtonText}>Submit</Text>
-          </TouchableOpacity>
-          <Divider/>
-          <TouchableOpacity 
-            style={style.toRegisterLink}
-            onPress={()=>navigation.navigate('Register')}
-            >
-            <Text style={style.toRegisterLinkText}>Create an account</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -172,7 +140,6 @@ const style = StyleSheet.create({
 
   },
   loginForm:{
-    height:'70%',
     width:'90%',
     borderRadius:10
   },
@@ -260,19 +227,6 @@ const style = StyleSheet.create({
     fontWeight:'bold',
     color:'white',
   },
-  toRegisterLink:{
-    backgroundColor:'white',
-    borderRadius:5,
-    justifyContent:'center',
-    paddingVertical:4,
-    marginTop:10
-  },
-  toRegisterLinkText:{
-    alignSelf:'center',
-    color:'#374FC6',
-    fontSize:23,
-    fontWeight:'bold',
-  },
   visibilityIcon:{
     alignSelf:'flex-end',
     position:'absolute',
@@ -282,4 +236,4 @@ const style = StyleSheet.create({
 
 })
 
-export default LoginScreen;
+export default BiometricEnrollmentScreen;
