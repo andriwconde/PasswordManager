@@ -19,7 +19,7 @@ const BiometricEnrollmentScreen = ({navigation})  => {
 
   useEffect(() => {
     if(loggedUser?.user.publickey){
-      navigation.navigate('Start')
+      navigation.goBack()
     }
   },[loggedUser])
 
