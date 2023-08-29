@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "TestingProyect.app"
-               BlueprintName = "TestingProyect"
-               ReferencedContainer = "container:TestingProyect.xcodeproj">
+               BuildableName = "PasswordManager.app"
+               BlueprintName = "PasswordManager"
+               ReferencedContainer = "container:PasswordManager.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "TestingProyectTests.xctest"
-               BlueprintName = "TestingProyectTests"
-               ReferencedContainer = "container:TestingProyect.xcodeproj">
+               BuildableName = "PasswordManagerTests.xctest"
+               BlueprintName = "PasswordManagerTests"
+               ReferencedContainer = "container:PasswordManager.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "TestingProyect.app"
-            BlueprintName = "TestingProyect"
-            ReferencedContainer = "container:TestingProyect.xcodeproj">
+            BuildableName = "PasswordManager.app"
+            BlueprintName = "PasswordManager"
+            ReferencedContainer = "container:PasswordManager.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "TestingProyect.app"
-            BlueprintName = "TestingProyect"
-            ReferencedContainer = "container:TestingProyect.xcodeproj">
+            BuildableName = "PasswordManager.app"
+            BlueprintName = "PasswordManager"
+            ReferencedContainer = "container:PasswordManager.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
