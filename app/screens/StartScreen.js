@@ -1,5 +1,5 @@
 import React,{ useState, useEffect } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native'
 import CheckBox from '@react-native-community/checkbox';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 import EncryptedStorage from 'react-native-encrypted-storage';
@@ -7,42 +7,38 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 const StartScreen = ({navigation}) => {
     const [showCheckbox,setShowCheckbox]=useState(false)
     const [toggleCheckBox, setToggleCheckBox] = useState(false)
-    const [text, setText] = React.useState('');
-    const hasUnsavedChanges = Boolean(text);
 
-React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-        hasBioAuthSensor()
-        console.log('hola----')
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-React.useEffect(() =>
-    navigation.addListener('beforeRemove', (e) => {
-    e.preventDefault();
-    Alert.alert(
-        'Sign out?',
-        'Are you sure to Sign out?',
-        [
-        { text: "Don't Sign out", style: 'cancel', onPress: () => {} },
-        {
-            text: 'Sign out',
-            style: 'destructive',
-            onPress: () => navigation.dispatch(e.data.action),
-        },
-        ]
-    );
-    }),
-[navigation, hasUnsavedChanges]
-);
+useEffect(() => {
+    hasBioAuthSensor()
+    hasUserId()
+    //deleteKeys()
+},[])
 
 useEffect(() => {
     if(toggleCheckBox){
         navigation.navigate('BiometricEnrollment');
     }
 },[toggleCheckBox,showCheckbox])
+
+const deleteKeys = async() =>{
+    try{
+      const { keysDeleted } = await rnBiometrics.deleteKeys()
+      console.log({keysDeleted})
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  const hasUserId = async()=>{
+    try{
+        const userId = await EncryptedStorage.getItem('userId')
+        console.log({userId})
+    }catch(err){
+        console.log(err)
+    }
     
+  }
+
 const hasBioAuthSensor = async () => {
     const rnBiometrics = new ReactNativeBiometrics()
     try{
@@ -51,8 +47,7 @@ const hasBioAuthSensor = async () => {
         console.log({available, keysExist})
         if(available && !keysExist){
             setShowCheckbox(true)
-            setToggleCheckBox(false)
-        }else if(available && keysExist){
+        }else{
             setShowCheckbox(false)
         }
     }catch(error){
