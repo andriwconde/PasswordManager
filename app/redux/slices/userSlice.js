@@ -16,7 +16,6 @@ export const userLogin = createAsyncThunk(
     'users/login',
      async (formValues) => {
       try{
-        console.log({formValues})
         const response = await userWS.login(formValues);
         if(response.data.status === 'error'){
           Alert.alert('error',response.data.message);
@@ -26,7 +25,7 @@ export const userLogin = createAsyncThunk(
             return response.data.data
           }else if(response.data.data.user.publicKey){
             Alert.alert(`Biometric Login set correctly`);
-            const setUserId = await EncryptedStorage.setItem(
+            await EncryptedStorage.setItem(
               'userId',
               response.data.data.user.id,
             );
@@ -36,7 +35,12 @@ export const userLogin = createAsyncThunk(
           Alert.alert(`Incorrect credentials`)
         }
       }catch(err){
-        console.log(err)
+        if (err.code === "ECONNABORTED"){
+          Alert.alert('comunication error with server',err.message)
+        }else{
+          Alert.alert('error with the request',err)
+          console.log('passwordManager',err)
+        }
       }
     }
   )
@@ -46,7 +50,6 @@ export const userLogin = createAsyncThunk(
     async (userCred) => {
       try{
         const response = await userWS.bioLogin(userCred)
-        console.log({bioLoginRes:response.data})
         if(response.data.status === 'success'){
           Alert.alert(`Welcome ${response.data.data.user.name}`);
           return response.data.data
@@ -63,7 +66,6 @@ export const userRegister = createAsyncThunk(
   'users/register',
   async (userCred) => {
     try{
-      console.log({userCred})
       const response = await userWS.register(userCred)
       if(response.data.status === 'success'){
         Alert.alert(`Successful Registration`);
@@ -117,7 +119,6 @@ const setRegisteredStateFalse = createAction('setRegisteredStateFalse')
       })
       builder.addCase(userRegister.fulfilled, (state,action) => {
         state.loading = 'FULFILLED'
-        console.log({reg:userRegister.fulfilled})
         state.registered = action.payload.status === 'success' ? true : false
       })
       builder.addCase(userRegister.rejected, (state,action) => {

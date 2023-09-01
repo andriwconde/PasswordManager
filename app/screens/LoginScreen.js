@@ -1,5 +1,5 @@
 import React,{ useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal, Alert, ScrollView } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
@@ -11,6 +11,7 @@ const LoginScreen = ({navigation})  => {
   const dispatch = useDispatch()
   const loggedUser = useSelector(state => state.user.loggedUser)
   const registered = useSelector(state => state.user.registered)
+  const loading = useSelector(state => state.user.loading)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
   const [formValues,setFormValues] = useState({
@@ -25,13 +26,11 @@ useEffect(() => {
 
 useEffect(()=>{
 if(registered){
-  console.log('hola')
   dispatch(setRegisteredStateFalse())
 }
 },[registered])
 
 useEffect(() => {
-  console.log(loggedUser)
   if(loggedUser?.user?.name){
     navigation.navigate('Start')
   }
@@ -74,7 +73,6 @@ const handleInput =(input,value)=>{
   setFormValues({...formValues,[input]:value})
 }
 const handleSubmit = async () => {
-  console.log('----hola')
   const {email,password} = formValues
  if(email === null || password === null) {
   setModalState(true);
@@ -142,6 +140,9 @@ const handleSubmit = async () => {
           </TouchableOpacity>
         </View>
       </View>
+      {loading === 'LOADING' && <View style={style.loadingContainer}>
+        <ActivityIndicator size="large" color="#374FC6" />
+      </View>}
       <Modal 
         animationType="fade"
         transparent={true}
@@ -279,7 +280,14 @@ const style = StyleSheet.create({
     marginTop:4,
     paddingRight:10
   },
-
+  loadingContainer: {
+    width: '100%',
+    height: '100%',
+    position:'absolute',
+    justifyContent: 'center',
+    backgroundColor:'#7F7F7F',
+    opacity:0.7
+  }
 })
 
 export default LoginScreen;

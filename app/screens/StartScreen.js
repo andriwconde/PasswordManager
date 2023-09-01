@@ -13,7 +13,6 @@ const StartScreen = ({navigation}) => {
 React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
         hasBioAuthSensor()
-        console.log('hola----')
     });
     return unsubscribe;
   }, [navigation]);
