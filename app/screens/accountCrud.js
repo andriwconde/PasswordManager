@@ -3,74 +3,34 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView,
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ReactNativeBiometrics from 'react-native-biometrics'
-import { userLogin, userBioLogin } from '../redux/slices/userSlice';
+import { addAccount } from '../redux/slices/accountSlice';
 import { Divider } from '../components/Divider';
-import EncryptedStorage from 'react-native-encrypted-storage';
 
-const LoginScreen = ({navigation})  => {
+const AccountCrud = ({navigation})  => {
   const dispatch = useDispatch()
   const loggedUser = useSelector(state => state.user.loggedUser)
   const loading = useSelector(state => state.user.loading)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
   const [formValues,setFormValues] = useState({
-    email: null,
+    accountTitle:null,
+    username: null,
     password: null,
-    publicKey: null
   })
-
-useEffect(() => {
-  hasBioAuthSensor()
-},[])
-
-useEffect(() => {
-  if(loggedUser?.user?.name){
-    navigation.navigate('Start')
-  }
-},[loggedUser])
-
 
 const handleVisibility=()=>{
   setVisibility(!visibility)
-}
-
-const hasBioAuthSensor = async () => {
-  const rnBiometrics = new ReactNativeBiometrics()
-  try{
-    const {available} = await rnBiometrics.isSensorAvailable()
-    if(available){
-      const { keysExist } = await rnBiometrics.biometricKeysExist()
-      if (keysExist){
-        const epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
-        const userId = await EncryptedStorage.getItem('userId')
-        const payload = `${epochTimeSeconds}__${userId}`
-        const { success, signature } = await rnBiometrics.createSignature({
-          promptMessage: 'Sign in',
-          payload
-        })
-        if(success){
-          const signatureId = {payload,signature}
-          dispatch(userBioLogin(signatureId))
-        }
-
-      }else{
-        console.log('Keys do not exist or were deleted')
-      }
-    }
-  }catch(err){
-    console.log(err)
-  }
 }
 
 const handleInput =(input,value)=>{
   setFormValues({...formValues,[input]:value})
 }
 const handleSubmit = async () => {
-  const {email,password} = formValues
- if(email === null || password === null) {
+  const {username, password, accountTitle} = formValues
+ if(username === null || password === null || accountTitle === null) {
   setModalState(true);
 } else{
-  dispatch(userLogin(formValues));
+  dispatch(addAccount(formValues));
 }
 }
 
@@ -78,17 +38,23 @@ const handleSubmit = async () => {
   return (
     <ScrollView contentContainerStyle={style.backgroundView}>
       <View style={style.loginForm}>
-        <View style={style.loginTitle}>
-          <Text style={style.titleText}>Login</Text>
-        </View>
         <View style={style.inputsView}>
           <View style={style.inputView}>
-            <Text style={style.inputTitleTextStyle}>E-mail:</Text>
+            <Text style={style.inputTitleTextStyle}>Account:</Text>
+            <TextInput 
+              style={style.inputStyles} 
+              placeholder='Business instagram'
+              onChangeText={(value)=>handleInput('accountTitle',value)}
+              placeholderTextColor='#ACACAC'
+            />
+          </View>
+          <View style={style.inputView}>
+            <Text style={style.inputTitleTextStyle}>Username:</Text>
             <TextInput 
               style={style.inputStyles} 
               placeholder='example@mail.com'
-              onChangeText={(value)=>handleInput('email',value)}
-              autoComplete='email'
+              onChangeText={(value)=>handleInput('username',value)}
+              autoComplete='username'
               placeholderTextColor='#ACACAC'
             />
           </View>
@@ -122,14 +88,7 @@ const handleSubmit = async () => {
             style={style.submitButton}
             onPress={handleSubmit}
             >
-            <Text style={style.submitButtonText}>Submit</Text>
-          </TouchableOpacity>
-          <Divider/>
-          <TouchableOpacity 
-            style={style.toRegisterLink}
-            onPress={()=>navigation.navigate('Register')}
-            >
-            <Text style={style.toRegisterLinkText}>Create an account</Text>
+            <Text style={style.submitButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -166,9 +125,8 @@ const style = StyleSheet.create({
 
   },
   loginForm:{
-    height:'70%',
+    height:'60%',
     width:'90%',
-    borderRadius:10
   },
   loginTitle:{
     borderTopRightRadius:10,
@@ -254,19 +212,6 @@ const style = StyleSheet.create({
     fontWeight:'bold',
     color:'white',
   },
-  toRegisterLink:{
-    backgroundColor:'white',
-    borderRadius:5,
-    justifyContent:'center',
-    paddingVertical:4,
-    marginTop:10
-  },
-  toRegisterLinkText:{
-    alignSelf:'center',
-    color:'#374FC6',
-    fontSize:23,
-    fontWeight:'bold',
-  },
   visibilityIcon:{
     alignSelf:'flex-end',
     position:'absolute',
@@ -283,4 +228,4 @@ const style = StyleSheet.create({
   }
 })
 
-export default LoginScreen;
+export default AccountCrud;

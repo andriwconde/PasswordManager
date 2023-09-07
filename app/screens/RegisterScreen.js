@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Modal } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { userRegister } from '../redux/slices/userSlice'
 import Icon from 'react-native-vector-icons/MaterialIcons';

@@ -92,7 +92,7 @@ export const appVersion = createAsyncThunk(
   }
 )
 
-const setRegisteredStateFalse = createAction('setRegisteredStateFalse')
+const userLogOut = createAction('user/logOut')
   
   // Then, handle actions in your reducers:
   const usersSlice = createSlice({
@@ -153,8 +153,8 @@ const setRegisteredStateFalse = createAction('setRegisteredStateFalse')
         state.error = action.error.message
       })
 //-----simple reducers -----------------------------------------------
-      builder.addCase(setRegisteredStateFalse, (state) => {
-        state.registered = false
+      builder.addCase(userLogOut, (state) => {
+        state.loggedUser = null
       })
     },
   })
@@ -164,4 +164,4 @@ const setRegisteredStateFalse = createAction('setRegisteredStateFalse')
   module.exports.userRegister = userRegister
   module.exports.userLogin = userLogin
   module.exports.userBioLogin = userBioLogin
-  module.exports.setRegisteredStateFalse = setRegisteredStateFalse
+  module.exports.userLogOut = userLogOut

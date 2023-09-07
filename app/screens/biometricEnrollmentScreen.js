@@ -1,5 +1,5 @@
 import React,{ useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
@@ -19,7 +19,7 @@ const BiometricEnrollmentScreen = ({navigation})  => {
 
   useEffect(() => {
     if(loggedUser?.user.publickey){
-      navigation.goBack()
+      navigation.navigate('Start')
     }
   },[loggedUser])
 
