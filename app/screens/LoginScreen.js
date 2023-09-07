@@ -16,7 +16,7 @@ const LoginScreen = ({navigation})  => {
   const [formValues,setFormValues] = useState({
     email: null,
     password: null,
-    publicKey: null
+    bioPK: null
   })
 
 useEffect(() => {

@@ -20,10 +20,10 @@ export const userLogin = createAsyncThunk(
         if(response.data.status === 'error'){
           Alert.alert('error',response.data.message);
         }else if(response.data.status === 'success'){
-          if(!response.data.data.user.publicKey){
+          if(!response.data.data.user.bioPK){
             Alert.alert(`Welcome ${response.data.data.user.name}`);
             return response.data.data
-          }else if(response.data.data.user.publicKey){
+          }else if(response.data.data.user.bioPK){
             Alert.alert(`Biometric Login set correctly`);
             await EncryptedStorage.setItem(
               'userId',

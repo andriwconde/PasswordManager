@@ -14,11 +14,11 @@ const BiometricEnrollmentScreen = ({navigation})  => {
   const [formValues,setFormValues] = useState({
     email: null,
     password: null,
-    publicKey: null
+    bioPK: null
   })
 
   useEffect(() => {
-    if(loggedUser?.user.publickey){
+    if(loggedUser?.user.bioPK){
       navigation.navigate('Start')
     }
   },[loggedUser])
@@ -49,7 +49,7 @@ const handleSubmit = async() => {
       const { success } = await rnBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
       if(success){
         const { publicKey }  = await rnBiometrics.createKeys()
-        const valuesWithKey ={...formValues,publicKey}
+        const valuesWithKey ={...formValues,bioPK:publicKey}
         dispatch(userLogin(valuesWithKey))
         console.log({valuesWithKey})
       }
