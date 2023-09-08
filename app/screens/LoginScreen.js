@@ -42,8 +42,8 @@ const hasBioAuthSensor = async () => {
       const { keysExist } = await rnBiometrics.biometricKeysExist()
       if (keysExist){
         const epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
-        const userId = await EncryptedStorage.getItem('userId')
-        const payload = `${epochTimeSeconds}__${userId}`
+        const user_id = await EncryptedStorage.getItem('user_id')
+        const payload = `${epochTimeSeconds}__${user_id}`
         const { success, signature } = await rnBiometrics.createSignature({
           promptMessage: 'Sign in',
           payload

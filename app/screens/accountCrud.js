@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView,
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ReactNativeBiometrics from 'react-native-biometrics'
-import { addAccount } from '../redux/slices/accountSlice';
+import { addAccount, accountStateClear } from '../redux/slices/accountSlice';
 import { Divider } from '../components/Divider';
 
 const AccountCrud = ({navigation})  => {
   const dispatch = useDispatch()
-  const loggedUser = useSelector(state => state.user.loggedUser)
+  const account = useSelector(state => state.account.account)
   const loading = useSelector(state => state.user.loading)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
@@ -18,21 +18,28 @@ const AccountCrud = ({navigation})  => {
     password: null,
   })
 
-const handleVisibility=()=>{
-  setVisibility(!visibility)
-}
+  useEffect(()=>{
+    if(account === true){
+      dispatch(accountStateClear())
+      navigation.navigate('Start')
+    }
+  },[account])
 
-const handleInput =(input,value)=>{
-  setFormValues({...formValues,[input]:value})
-}
-const handleSubmit = async () => {
-  const {username, password, accountTitle} = formValues
- if(username === null || password === null || accountTitle === null) {
-  setModalState(true);
-} else{
-  dispatch(addAccount(formValues));
-}
-}
+  const handleVisibility=()=>{
+    setVisibility(!visibility)
+  }
+
+  const handleInput =(input,value)=>{
+    setFormValues({...formValues,[input]:value})
+  }
+  const handleSubmit = async () => {
+    const {username, password, accountTitle} = formValues
+  if(username === null || password === null || accountTitle === null) {
+    setModalState(true);
+  } else{
+    dispatch(addAccount(formValues));
+  }
+  }
 
 
   return (

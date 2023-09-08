@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { userRegister } from '../redux/slices/userSlice'
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 const RegisterScreen =({navigation})=>{
   const dispatch = useDispatch()
   const registered = useSelector(state=>state.user.registered)
+  const loading = useSelector(state=>state.user.loading)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
   const [formValues,setFormValues] = useState({
@@ -126,6 +127,10 @@ return (
           </View>
         </View>
       </Modal>
+      {loading === 'LOADING' && 
+        <View style={style.loadingContainer}>
+          <ActivityIndicator size="large" color="#374FC6" />
+        </View>}
   </View>
 );
 }
@@ -264,5 +269,13 @@ const style = StyleSheet.create({
         marginTop:4,
         paddingRight:10
       },
+      loadingContainer: {
+        width: '100%',
+        height: '100%',
+        position:'absolute',
+        justifyContent: 'center',
+        backgroundColor:'#7F7F7F',
+        opacity:0.7
+      }
 })
 export default RegisterScreen

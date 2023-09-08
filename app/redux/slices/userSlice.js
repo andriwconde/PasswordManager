@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice, createAction } from '@reduxjs/toolkit'
 import  userWS  from '../../networking/endpoint/userWS'
 import { Alert } from 'react-native';
+import { setClientToken } from '../../networking/api';
+import { RSA } from 'react-native-rsa-native';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 
@@ -21,14 +23,26 @@ export const userLogin = createAsyncThunk(
           Alert.alert('error',response.data.message);
         }else if(response.data.status === 'success'){
           if(!response.data.data.user.bioPK){
-            Alert.alert(`Welcome ${response.data.data.user.name}`);
+            const transferKeys = await EncryptedStorage.getItem('transferKeys')
+            if(!transferKeys){
+              setClientToken(response.data.data.token)
+              const keys = await RSA.generateKeys(4096)
+              const backendPK = await userWS.userKeysInterchange({frontPK:keys.public,user_id:response.data.data.user.id})
+              await EncryptedStorage.setItem('transferKeys', JSON.stringify(keys))
+              await EncryptedStorage.setItem('backendPK', backendPK.data.data.backendPK)
+              await EncryptedStorage.setItem('user_id', response.data.data.user.id)
+              Alert.alert(`Welcome ${response.data.data.user.name}`);
+            }else {
+              setClientToken(response.data.data.token)
+              Alert.alert(`Welcome ${response.data.data.user.name}`);
+            }
             return response.data.data
           }else if(response.data.data.user.bioPK){
-            Alert.alert(`Biometric Login set correctly`);
             await EncryptedStorage.setItem(
-              'userId',
+              'user_id',
               response.data.data.user.id,
             );
+            Alert.alert(`Biometric Login set correctly`);
             return response.data.data
           }
         }else{
@@ -51,6 +65,7 @@ export const userLogin = createAsyncThunk(
       try{
         const response = await userWS.bioLogin(userCred)
         if(response.data.status === 'success'){
+          setClientToken(response.data.data.token)
           Alert.alert(`Welcome ${response.data.data.user.name}`);
           return response.data.data
         }else if(response.data.status === 'error'){
@@ -100,6 +115,7 @@ const userLogOut = createAction('user/logOut')
     initialState,
     reducers: {},
     extraReducers: (builder) => {
+//----------------------version-----------------------------------------
       builder.addCase(appVersion.pending, (state) => {
         state.loading='LOADING'
       })
@@ -112,7 +128,7 @@ const userLogOut = createAction('user/logOut')
         state.version = ''
         state.error = action.error.message
       })
-//-------register-----------------------------------------
+//-----------------------register-----------------------------------------
 
       builder.addCase(userRegister.pending, (state) => {
         state.loading='LOADING'
@@ -127,7 +143,7 @@ const userLogOut = createAction('user/logOut')
         state.error = action.error.message
       })
 
-//----login------------------------------------------------------
+//----------------login------------------------------------------------------
       builder.addCase(userLogin.pending, (state) => {
         state.loading='LOADING'
       })
@@ -140,7 +156,7 @@ const userLogOut = createAction('user/logOut')
         state.error = action.error.message
       })
 
-//-----bioLogin-------------------------------------------------------
+//--------------bioLogin-------------------------------------------------------
       builder.addCase(userBioLogin.pending, (state) => {
         state.loading='LOADING'
       })

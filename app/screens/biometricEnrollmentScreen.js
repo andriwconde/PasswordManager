@@ -30,7 +30,6 @@ const BiometricEnrollmentScreen = ({navigation})  => {
 const deleteKeys = async() =>{
   try{
     const { keysDeleted } = await rnBiometrics.deleteKeys()
-    console.log({keysDeleted})
   }catch(err){
     console.log(err)
   }
@@ -51,7 +50,6 @@ const handleSubmit = async() => {
         const { publicKey }  = await rnBiometrics.createKeys()
         const valuesWithKey ={...formValues,bioPK:publicKey}
         dispatch(userLogin(valuesWithKey))
-        console.log({valuesWithKey})
       }
     }catch(err){
       console.log({err})

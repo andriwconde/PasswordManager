@@ -1,15 +1,19 @@
 import React,{ useState, useEffect } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Alert, Pressable } from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, FlatList, ActivityIndicator } from 'react-native'
 import CheckBox from '@react-native-community/checkbox';
 import ReactNativeBiometrics from 'react-native-biometrics'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { userLogOut } from '../redux/slices/userSlice'
 import { useIsFocused } from '@react-navigation/native';
+import { getAccounts } from '../redux/slices/accountSlice'
+import EncryptedStorage from 'react-native-encrypted-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const StartScreen = ({navigation}) => {
     const dispatch = useDispatch()
     const rnBiometrics = new ReactNativeBiometrics()
+    const accounts = useSelector(state=>state.account.accounts)
+    const loading = useSelector(state=>state.account.loading)
     const [showCheckbox,setShowCheckbox]=useState(false)
     const [toggleCheckBox, setToggleCheckBox] = useState(false)
     const isFocused = useIsFocused()
@@ -24,10 +28,13 @@ const StartScreen = ({navigation}) => {
              { text: 'Log out',
                style: 'destructive',
                onPress: async() => {
-                const { keysDeleted } = await rnBiometrics.deleteKeys()
-                if(keysDeleted){
-                    dispatch(userLogOut())
-                    navigation.dispatch(e.data.action)
+                await EncryptedStorage.clear();
+                await rnBiometrics.deleteKeys();
+                const { keysExist } = await rnBiometrics.biometricKeysExist()
+                trasferKeys = await EncryptedStorage.getItem('transferKeys')
+                if(keysExist === false && trasferKeys === null){
+                    dispatch(userLogOut());
+                    navigation.dispatch(e.data.action);
                 }
                }
              }
@@ -39,6 +46,7 @@ const StartScreen = ({navigation}) => {
 
 useEffect(() => {
     hasBioAuthSensor()
+    dispatch(getAccounts())
 },[isFocused])
 
 useEffect(() => {
@@ -51,7 +59,7 @@ const hasBioAuthSensor = async () => {
     try{
         const {available} = await rnBiometrics.isSensorAvailable()
         const { keysExist } = await rnBiometrics.biometricKeysExist()
-        console.log({available, keysExist})
+        const transferKeys = await EncryptedStorage.getItem('transferKeys')
         if(available && !keysExist){
             setShowCheckbox(true)
             setToggleCheckBox(false)
@@ -94,6 +102,22 @@ const options = ()=>{
                     <Icon name='more-vert' size={40} color="white"/>
                 </Pressable>
             </View>
+            <View style={style.flatListContainer}>
+                <FlatList
+                    data={accounts}
+                    renderItem={({item,index}) =>
+                    <View style={style.itemView}>
+                        <Text style={style.itemTextTitle}>{item.accountTitle}</Text>
+                        <Text style={style.itemText}>{item.username}</Text>
+                        {accounts.length -1 !== index && <View style={style.dividerContainer}>
+                            <View style={style.divider}/>
+                        </View>}
+                    </View>
+                    }
+                    keyExtractor={account => account._id}
+                />
+            </View>
+            
             {showCheckbox && 
                 <TouchableOpacity style={style.bioAuthCheckbox} onPress={()=>checkBoxOnhange(!toggleCheckBox)}>
                     <CheckBox
@@ -104,6 +128,10 @@ const options = ()=>{
                     <Text style={style.bioAuthCheckboxText}>Enable biometric authentication</Text>
                 </TouchableOpacity>
             }
+        {loading === 'LOADING' &&
+            <View style={style.loadingContainer}>
+                <ActivityIndicator size="large" color="#374FC6" />
+            </View>}
         </View>
     );
 }
@@ -132,9 +160,48 @@ const style = StyleSheet.create({
         flexDirection:'row',
         with:'100%',
         justifyContent:'space-around',
-        paddingTop:'2%'
-
-    }
+        paddingTop:'2%',
+    },
+    itemView:{
+        backgroundColor:'white',
+        paddingHorizontal:10,
+    },
+    itemTextTitle:{
+        fontSize:20,
+        fontWeight:'bold',
+        color:'#4996FA',
+    },
+    itemText:{
+        fontSize:15,
+        fontWeight:'400',
+        color:'#4996FA',
+    },
+    flatListContainer:{
+        borderRadius:20,
+        borderWidth:1,
+        paddingVertical:8,
+        marginTop:10,
+        backgroundColor:'white',
+        borderColor:'white',
+        paddingHorizontal:5,
+        height:'85%'
+    },
+    divider:{
+        borderBottomWidth:1,
+        borderBottomColor:'#BCBCBC'
+    },
+    dividerContainer:{
+        paddingHorizontal:30,
+        paddingTop:6
+    },
+    loadingContainer: {
+        width: '100%',
+        height: '100%',
+        position:'absolute',
+        justifyContent: 'center',
+        backgroundColor:'#7F7F7F',
+        opacity:0.7
+      }
 })
 
 export default StartScreen;

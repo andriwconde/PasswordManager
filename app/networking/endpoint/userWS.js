@@ -10,6 +10,9 @@ export default userWS = {
     register: async function (userCred) {
         return await axios.post('/user/register', userCred);
     },
+    userKeysInterchange: async function (userCred) {
+        return await axios.post('/user/userKeysInterchange', userCred);
+    },
     version: async function () {
         return await axios.get('/version');
     },
