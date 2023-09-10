@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 import { userLogin } from '../redux/slices/userSlice';
+import IconButton from '../components/iconButton';
+
 
 const BiometricEnrollmentScreen = ({navigation})  => {
   const dispatch = useDispatch()
@@ -59,6 +61,9 @@ const handleSubmit = async() => {
 
   return (
     <View style={style.backgroundView}>
+      <View style={style.backButton}>
+        <IconButton onPress={()=>navigation.goBack()} icon='chevron-left' size={50} color="white"/>
+      </View>
       <View style={style.loginForm}>
       <View style={style.loginTitle}>
           <Text style={style.titleText}>Biometric Enrollment</Text>
@@ -133,7 +138,6 @@ const style = StyleSheet.create({
   backgroundView:{
     flex:1,
     alignItems:'center',
-    justifyContent:'center',
     backgroundColor: '#4996FA',
 
   },
@@ -231,7 +235,11 @@ const style = StyleSheet.create({
     marginTop:4,
     paddingRight:10
   },
-
+  backButton:{
+    alignSelf:'flex-start',
+    marginBottom:'50%',
+    marginTop:'3%'
+  }
 })
 
 export default BiometricEnrollmentScreen;

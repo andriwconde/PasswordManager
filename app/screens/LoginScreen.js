@@ -163,7 +163,6 @@ const style = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center',
     backgroundColor: '#4996FA',
-
   },
   loginForm:{
     height:'70%',

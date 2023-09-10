@@ -5,7 +5,7 @@ import LoginScreen from './app/screens/loginScreen';
 import RegisterScreen from './app/screens/registerScreen';
 import StartScreen  from './app/screens/startScreen';
 import BiometricEnrollmentScreen from './app/screens/biometricEnrollmentScreen';
-import AccountCrud from './app/screens/accountCrud';
+import AccountCrud from './app/screens/accountCrudScreen';
 import { Provider } from 'react-redux';
 import {store} from './app/redux/store'
 

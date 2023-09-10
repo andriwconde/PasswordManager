@@ -4,7 +4,13 @@ export default userWS = {
     addAccount: async function (account) {
         return await axios.post('/account/add', account);
     },
-    getAccounts: async function (user_id){
-        return await axios.post('/account/getAccounts', user_id)
+    getAccounts: async function (accounts){
+        return await axios.post('/account/getAccounts', accounts)
+    },
+    updateAccount: async function (account){
+        return await axios.post('/account/update', account)
+    },
+    deleteAccount: async function (account_id){
+        return await axios.post('/account/delete', account_id)
     }
 };

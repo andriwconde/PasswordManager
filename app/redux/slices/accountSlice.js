@@ -29,6 +29,33 @@ export const addAccount = createAsyncThunk(
   }
 )
 
+export const updateAccount = createAsyncThunk(
+  'account/update',
+  async ({formValues,account_id}) => {
+    try{
+      const backendPK = await EncryptedStorage.getItem('backendPK');
+      const stringAccount = JSON.stringify({...formValues});
+      const encryptedAccount = await RSA.encrypt(stringAccount, backendPK)
+      const response = await accountWS.updateAccount({encryptedAccount, account_id})
+      return response.data.data
+    }catch(err){
+      console.log(err)
+    }
+  }
+)
+
+export const deleteAccount = createAsyncThunk(
+  'account/delete',
+  async (account_id) => {
+    try{
+      const response = await accountWS.deleteAccount({account_id})
+      return response.data.data
+    }catch(err){
+      console.log(err)
+    }
+  }
+)
+
 export const getAccounts = createAsyncThunk(
   'account/getAccounts',
   async ()=>{
@@ -82,6 +109,33 @@ const accountStateClear = createAction('account/clear')
         state.accounts = 'error'
         state.error = action.error.message
       })
+//----------------updateAccount-----------------------------------------
+
+      builder.addCase(updateAccount.pending, (state) => {
+        state.loading='LOADING'
+      })
+      builder.addCase(updateAccount.fulfilled, (state,action) => {
+        state.loading = 'FULFILLED'
+        state.account = action.payload
+      })
+      builder.addCase(updateAccount.rejected, (state,action) => {
+        state.loading = 'REJECTED'
+        state.account = 'error'
+        state.error = action.error.message
+      })
+//------------------deleteAccount-----------------------------------------
+      builder.addCase(deleteAccount.pending, (state) => {
+        state.loading='LOADING'
+      })
+      builder.addCase(deleteAccount.fulfilled, (state,action) => {
+        state.loading = 'FULFILLED'
+        state.account = action.payload
+      })
+      builder.addCase(deleteAccount.rejected, (state,action) => {
+        state.loading = 'REJECTED'
+        state.account = 'error'
+        state.error = action.error.message
+      })
 //-----simple reducers -----------------------------------------------
       builder.addCase(accountStateClear, (state) => {
         state.account = false
@@ -91,6 +145,8 @@ const accountStateClear = createAction('account/clear')
 
   module.exports = acountSlice.reducer
   module.exports.addAccount = addAccount
+  module.exports.updateAccount = updateAccount
   module.exports.getAccounts = getAccounts
   module.exports.accountStateClear = accountStateClear
+  module.exports.deleteAccount = deleteAccount
 

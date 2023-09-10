@@ -1,26 +1,31 @@
 import React,{ useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import ReactNativeBiometrics from 'react-native-biometrics'
-import { addAccount, accountStateClear } from '../redux/slices/accountSlice';
-import { Divider } from '../components/Divider';
+import { addAccount, accountStateClear, updateAccount, deleteAccount } from '../redux/slices/accountSlice';
+import IconButton from '../components/iconButton';
+import { getAccounts } from '../redux/slices/accountSlice'
 
-const AccountCrud = ({navigation})  => {
+
+const AccountCrudScreen = ({route,navigation})  => {
   const dispatch = useDispatch()
+  const item = route.params
   const account = useSelector(state => state.account.account)
   const loading = useSelector(state => state.user.loading)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
+  const [editableInputs, setEditableInputs] = useState(item ? false : true)
   const [formValues,setFormValues] = useState({
-    accountTitle:null,
-    username: null,
-    password: null,
+    accountTitle: item ? item.accountTitle : null,
+    username: item ? item.username : null,
+    password: item ? item.password : null,
   })
 
   useEffect(()=>{
-    if(account === true){
+    if(account?.status === true){
       dispatch(accountStateClear())
+      dispatch(getAccounts())
+      Alert.alert(`Account ${account.action}`,account.msg)
       navigation.navigate('Start')
     }
   },[account])
@@ -32,25 +37,58 @@ const AccountCrud = ({navigation})  => {
   const handleInput =(input,value)=>{
     setFormValues({...formValues,[input]:value})
   }
-  const handleSubmit = async () => {
+  const handleSubmit = async() => {
     const {username, password, accountTitle} = formValues
   if(username === null || password === null || accountTitle === null) {
     setModalState(true);
   } else{
-    dispatch(addAccount(formValues));
+    if(item && editableInputs){
+      dispatch(updateAccount({formValues,account_id:item._id}))
+    }else if(item && !editableInputs){
+      setEditableInputs(true)
+    }else if(item === undefined){
+      dispatch(addAccount(formValues));
+    } 
   }
   }
 
+  const cancelButton = ()=>{
+    if(editableInputs && item){
+      setEditableInputs(false)
+    }else if(!editableInputs && item){
+      Alert.alert(
+        'Delete Account',
+        'Are you sure you want to delete this account?',
+        [{ text: "Don't delete it", style: 'cancel', onPress: () => {} },
+         {  text: 'Delete', 
+            style: 'destructive', 
+            onPress: async() => {
+              dispatch(deleteAccount(item._id))
+            }
+          }
+        ]
+      )   
+    }
+  }
 
   return (
     <ScrollView contentContainerStyle={style.backgroundView}>
+      <View style={style.backButton}>
+        <IconButton onPress={()=>navigation.goBack()} icon='chevron-left' size={50} color="white"/>
+      </View>
+      { item ? editableInputs ? <Text style={style.CRUDTitle}>Update Account</Text>: 
+        <Text style={style.CRUDTitle}>Account</Text>:
+        <Text style={style.CRUDTitle}>Create Account</Text>
+      }
       <View style={style.loginForm}>
         <View style={style.inputsView}>
           <View style={style.inputView}>
             <Text style={style.inputTitleTextStyle}>Account:</Text>
             <TextInput 
-              style={style.inputStyles} 
+              style={[style.inputStyles,editableInputs ? style.editingInput : style.disabledInput ]} 
               placeholder='Business instagram'
+              value={formValues.accountTitle}
+              editable={editableInputs}
               onChangeText={(value)=>handleInput('accountTitle',value)}
               placeholderTextColor='#ACACAC'
             />
@@ -58,8 +96,10 @@ const AccountCrud = ({navigation})  => {
           <View style={style.inputView}>
             <Text style={style.inputTitleTextStyle}>Username:</Text>
             <TextInput 
-              style={style.inputStyles} 
+              style={[style.inputStyles,editableInputs ? style.editingInput : style.disabledInput ]} 
               placeholder='example@mail.com'
+              value={formValues.username}
+              editable={editableInputs}
               onChangeText={(value)=>handleInput('username',value)}
               autoComplete='username'
               placeholderTextColor='#ACACAC'
@@ -69,9 +109,11 @@ const AccountCrud = ({navigation})  => {
             <Text style={style.inputTitleTextStyle}>Password:</Text>
             <View >
               <TextInput 
-              style={style.inputStyles}
+              style={[style.inputStyles,editableInputs ? style.editingInput : style.disabledInput ]}
               placeholder='one-secure-password'
+              value={formValues.password}
               placeholderTextColor='#ACACAC'
+              editable={editableInputs}
               secureTextEntry={!visibility}
               onChangeText={(value)=>handleInput('password',value)}
               />
@@ -95,8 +137,14 @@ const AccountCrud = ({navigation})  => {
             style={style.submitButton}
             onPress={handleSubmit}
             >
-            <Text style={style.submitButtonText}>Save</Text>
+            <Text style={style.submitButtonText}>{item ? !editableInputs ?'Edit':'Update':'Save'}</Text>
           </TouchableOpacity>
+          {item && <TouchableOpacity 
+            style={style.submitButton}
+            onPress={cancelButton}
+            >
+            <Text style={style.cancelButtonText}>{item ? editableInputs ?'Cancel':'Delete':''}</Text>
+          </TouchableOpacity>}
         </View>
       </View>
       {loading === 'LOADING' && <View style={style.loadingContainer}>
@@ -127,7 +175,6 @@ const style = StyleSheet.create({
   backgroundView:{
     flex:1,
     alignItems:'center',
-    justifyContent:'center',
     backgroundColor: '#4996FA',
 
   },
@@ -156,13 +203,18 @@ const style = StyleSheet.create({
   },
   inputStyles:{
     borderWidth:2,
-    backgroundColor:'white',
     borderRadius:5,
     borderColor:'white',
     fontWeight:'bold',
     color:'black',
     fontSize:20,
     paddingVertical:6,
+  },
+  disabledInput:{
+    backgroundColor:'#DFDFDF',
+  },
+  editingInput:{
+    backgroundColor:'white',
   },
   inputsView:{
     paddingHorizontal:4,
@@ -180,6 +232,12 @@ const style = StyleSheet.create({
   submitButtonText:{
     alignSelf:'center',
     color:'#374FC6',
+    fontSize:23,
+    fontWeight:'bold',
+  },
+  cancelButtonText:{
+    alignSelf:'center',
+    color:'#FF6565',
     fontSize:23,
     fontWeight:'bold',
   },
@@ -232,7 +290,17 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor:'#7F7F7F',
     opacity:0.7
+  },
+  backButton:{
+    alignSelf:'flex-start',
+    marginBottom:'50%',
+    marginTop:'3%'
+  },
+  CRUDTitle:{
+    fontSize:30,
+    fontWeight:'bold',
+    color:'white',
   }
 })
 
-export default AccountCrud;
+export default AccountCrudScreen;

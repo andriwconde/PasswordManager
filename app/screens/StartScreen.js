@@ -1,22 +1,25 @@
-import React,{ useState, useEffect } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, FlatList, ActivityIndicator } from 'react-native'
+import React,{ useState, useEffect, useRef } from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, FlatList, ActivityIndicator, DrawerLayoutAndroid } from 'react-native'
 import CheckBox from '@react-native-community/checkbox';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 import ReactNativeBiometrics from 'react-native-biometrics'
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogOut } from '../redux/slices/userSlice'
 import { useIsFocused } from '@react-navigation/native';
 import { getAccounts } from '../redux/slices/accountSlice'
 import EncryptedStorage from 'react-native-encrypted-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-
+import IconButton from '../components/iconButton';
+import { Drawer } from '../components/drawer';
 const StartScreen = ({navigation}) => {
+    const drawer = useRef(null);
     const dispatch = useDispatch()
+    const isFocused = useIsFocused()
     const rnBiometrics = new ReactNativeBiometrics()
     const accounts = useSelector(state=>state.account.accounts)
     const loading = useSelector(state=>state.account.loading)
-    const [showCheckbox,setShowCheckbox]=useState(false)
-    const [toggleCheckBox, setToggleCheckBox] = useState(false)
-    const isFocused = useIsFocused()
+    const [bioCheckBox, setBioCheckbox] = useState({ show:false, value:false })
+    const [showDeleteCheckbox, setShowDeleteCheckbox] = useState(false)
+    const [deleteChecknoxValues,setDeleteChecknoxValues] = useState([])
     
     useEffect(() => {
         navigation.addListener('beforeRemove', (e) => {
@@ -45,94 +48,92 @@ const StartScreen = ({navigation}) => {
 
 
 useEffect(() => {
-    hasBioAuthSensor()
     dispatch(getAccounts())
+},[])
+
+useEffect(() => {
+    hasBioAuthSensor()
 },[isFocused])
 
 useEffect(() => {
-    if(toggleCheckBox){
+    if(bioCheckBox.value){
         navigation.navigate('BiometricEnrollment');
     }
-},[toggleCheckBox,showCheckbox])
+},[bioCheckBox.value])
     
 const hasBioAuthSensor = async () => {
     try{
         const {available} = await rnBiometrics.isSensorAvailable()
         const { keysExist } = await rnBiometrics.biometricKeysExist()
-        const transferKeys = await EncryptedStorage.getItem('transferKeys')
-        if(available && !keysExist){
-            setShowCheckbox(true)
-            setToggleCheckBox(false)
-        }else if(available && keysExist){
-            setShowCheckbox(false)
+        if(available && keysExist){
+            setBioCheckbox({...bioCheckBox,show:false})
+        }else if(available && !keysExist){
+            setBioCheckbox({show:true,value:false})
         }
     }catch(error){
         console.log(error)
     }
-}
-    
-const checkBoxOnhange = async(newValue)=>{
-    setToggleCheckBox(newValue)
 }
 
 const addAccount = ()=>{
     navigation.navigate('AccountCrud')
 }
 
-const removeAccounts = ()=>{
-    console.log('remove')
+const showDeleteCheckboxFn = ()=>{
+    setShowDeleteCheckbox(!showDeleteCheckbox)
+}
+
+const setDeletCheckboxValues = (account_id)=>{
+    setDeleteChecknoxValues(deleteChecknoxValues.concat([account_id]))
 }
 
 const options = ()=>{
-    console.log('options')
+    drawer.current?.openDrawer()
 }
 
 
     return (
+/*         <DrawerLayoutAndroid
+            ref={drawer}
+            drawerWidth={300}
+            drawerPosition='right'
+            renderNavigationView={Drawer}
+            style={style.backgroundView}> */
         <View style={style.backgroundView}>
             <View style={style.headerContainer}>
                 <Text style={style.titleText}>Accounts</Text>
-                <Pressable onPress={removeAccounts} style={style.addButton}>
-                    <Icon name='remove' size={40} color="white"/>
-                </Pressable>
-                <Pressable onPress={addAccount} style={style.deleteButton}>
-                    <Icon name='add' size={40} color="white"/>
-                </Pressable>
-                <Pressable onPress={options} style={style.optionsButton}>
-                    <Icon name='more-vert' size={40} color="white"/>
-                </Pressable>
+                <IconButton onPress={showDeleteCheckboxFn} icon='remove' size={40} color="white"/>
+                <IconButton onPress={addAccount} icon='add' size={40} color="white"/>
+                <IconButton onPress={options} icon='more-vert' size={40} color="white"/>
             </View>
             <View style={style.flatListContainer}>
                 <FlatList
                     data={accounts}
+                    onRefresh={()=>dispatch(getAccounts())}
+                    refreshing={loading === 'LOADING'}
                     renderItem={({item,index}) =>
-                    <View style={style.itemView}>
-                        <Text style={style.itemTextTitle}>{item.accountTitle}</Text>
-                        <Text style={style.itemText}>{item.username}</Text>
-                        {accounts.length -1 !== index && <View style={style.dividerContainer}>
-                            <View style={style.divider}/>
-                        </View>}
-                    </View>
+                    <Pressable onPress={()=>navigation.navigate('AccountCrud',item)} style={style.itemView}>
+                        {showDeleteCheckbox && 
+                                <BouncyCheckbox
+                                fillColor="#FF5858"
+                                unfillColor="#FFFFFF"
+                                onPress={cheked=>{cheked && setDeletCheckboxValues(item._id)}}/>}
+                            
+                        <View style={style.itemDataView}>
+                            <Text style={[style.itemTextTitle, showDeleteCheckbox ? style.shortPadding:style.longPadding]}>{item.accountTitle}</Text>
+                            <Text style={[style.itemText, showDeleteCheckbox ? style.shortPadding:style.longPadding]}>{item.username}</Text>
+                            {accounts.length -1 !== index && 
+                                <View style={[style.dividerContainer, showDeleteCheckbox ? style.shortPadding:style.longPadding]}>
+                                    <View style={style.divider}/>
+                                </View>}
+                        </View>
+                    </Pressable>
                     }
                     keyExtractor={account => account._id}
                 />
             </View>
-            
-            {showCheckbox && 
-                <TouchableOpacity style={style.bioAuthCheckbox} onPress={()=>checkBoxOnhange(!toggleCheckBox)}>
-                    <CheckBox
-                        disabled={false}
-                        value={toggleCheckBox}
-                        onValueChange={checkBoxOnhange}
-                    />
-                    <Text style={style.bioAuthCheckboxText}>Enable biometric authentication</Text>
-                </TouchableOpacity>
-            }
-        {loading === 'LOADING' &&
-            <View style={style.loadingContainer}>
-                <ActivityIndicator size="large" color="#374FC6" />
-            </View>}
         </View>
+        /* </DrawerLayoutAndroid> */
     );
 }
 
@@ -165,12 +166,24 @@ const style = StyleSheet.create({
     itemView:{
         backgroundColor:'white',
         paddingHorizontal:10,
+        flexDirection:'row',
+        width:'100%'
     },
     itemTextTitle:{
         fontSize:20,
         fontWeight:'bold',
-        color:'#4996FA',
+        color:'#4996FA' 
     },
+    shortPadding:{
+        paddingLeft:0
+    },
+    longPadding:{
+        paddingLeft:15
+    },
+    dividerContainer:{
+        paddingTop:6,
+    },
+
     itemText:{
         fontSize:15,
         fontWeight:'400',
@@ -190,17 +203,8 @@ const style = StyleSheet.create({
         borderBottomWidth:1,
         borderBottomColor:'#BCBCBC'
     },
-    dividerContainer:{
-        paddingHorizontal:30,
-        paddingTop:6
-    },
-    loadingContainer: {
-        width: '100%',
-        height: '100%',
-        position:'absolute',
-        justifyContent: 'center',
-        backgroundColor:'#7F7F7F',
-        opacity:0.7
+      itemDataView:{
+        flex:1
       }
 })
 
