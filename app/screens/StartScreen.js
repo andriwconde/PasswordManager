@@ -52,7 +52,7 @@ useEffect(() => {
 },[])
 
 useEffect(() => {
-    hasBioAuthSensor()
+    isFocused  &&  hasBioAuthSensor()
 },[isFocused])
 
 useEffect(() => {
@@ -68,7 +68,17 @@ const hasBioAuthSensor = async () => {
         if(available && keysExist){
             setBioCheckbox({...bioCheckBox,show:false})
         }else if(available && !keysExist){
-            setBioCheckbox({show:true,value:false})
+            Alert.alert(
+                'Welcome',
+                'Do you want to enable biometric autentication?',
+                [{ text: "No Thanks", style: 'cancel', onPress: () => {} },
+                 { text: 'Yes',
+                   style: 'destructive',
+                   onPress: () => navigation.navigate('BiometricEnrollment')
+                 }
+                ]
+            );
+            //setBioCheckbox({show:true,value:false})
         }
     }catch(error){
         console.log(error)

@@ -21,7 +21,7 @@ export const addAccount = createAsyncThunk(
       const stringAccount = JSON.stringify({...account});
       const encryptedAccount = await RSA.encrypt(stringAccount, backendPK)
       const response = await accountWS.addAccount({encryptedAccount,user_id})
-      return response.data.data.newAccount
+      return response.data.data
       
     }catch(err){
       console.log(err)
@@ -88,7 +88,7 @@ const accountStateClear = createAction('account/clear')
       })
       builder.addCase(addAccount.fulfilled, (state,action) => {
         state.loading = 'FULFILLED'
-        state.account = action.payload.user_id ? true: false
+        state.account = action.payload
       })
       builder.addCase(addAccount.rejected, (state,action) => {
         state.loading = 'REJECTED'
