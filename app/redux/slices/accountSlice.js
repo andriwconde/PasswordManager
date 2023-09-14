@@ -21,8 +21,11 @@ export const addAccount = createAsyncThunk(
       const stringAccount = JSON.stringify({...account});
       const encryptedAccount = await RSA.encrypt(stringAccount, backendPK)
       const response = await accountWS.addAccount({encryptedAccount,user_id})
-      return response.data.data
-      
+      if(response.data.data){
+        return response.data.data
+      }else if(response.data.code === 403){
+        return response.data
+      } 
     }catch(err){
       console.log(err)
     }
@@ -37,7 +40,11 @@ export const updateAccount = createAsyncThunk(
       const stringAccount = JSON.stringify({...formValues});
       const encryptedAccount = await RSA.encrypt(stringAccount, backendPK)
       const response = await accountWS.updateAccount({encryptedAccount, account_id})
-      return response.data.data
+      if(response.data.data){
+        return response.data.data
+      }else if(response.data.code === 403){
+        return response.data
+      } 
     }catch(err){
       console.log(err)
     }
@@ -49,7 +56,11 @@ export const deleteAccount = createAsyncThunk(
   async (account_id) => {
     try{
       const response = await accountWS.deleteAccount({account_id})
-      return response.data.data
+      if(response.data.data){
+        return response.data.data
+      }else if(response.data.code === 403){
+        return response.data
+      } 
     }catch(err){
       console.log(err)
     }
@@ -61,7 +72,11 @@ export const deleteManyAccounts = createAsyncThunk(
   async (accountsArray) => {
     try{
       const response = await accountWS.deleteManyAccounts({accountsArray})
-      return response.data.data
+      if(response.data.data){
+        return response.data.data
+      }else if(response.data.code === 403){
+        return response.data
+      } 
     }catch(err){
       console.log(err)
     }
@@ -74,11 +89,15 @@ export const getAccounts = createAsyncThunk(
     try{
       const user_id = await EncryptedStorage.getItem('user_id');
       const encrytedAccounts = await accountWS.getAccounts({user_id});
-      const keys = JSON.parse(await EncryptedStorage.getItem('transferKeys'));
-      const decryptedAccounts = await Promise.all( encrytedAccounts.data.data.map(async (account)=>{
-         return  JSON.parse(await RSA.decrypt(account,keys.private))
-      }))
-      return decryptedAccounts
+      if(encrytedAccounts.data.data){
+        const keys = JSON.parse(await EncryptedStorage.getItem('transferKeys'));
+        const decryptedAccounts = await Promise.all( encrytedAccounts.data.data.map(async (account)=>{
+           return  JSON.parse(await RSA.decrypt(account,keys.private))
+        }))
+        return decryptedAccounts 
+      }else if(encrytedAccounts.data.code === 403){
+        return encrytedAccounts.data
+      }
     }catch(err){
       console.log(err)
     }

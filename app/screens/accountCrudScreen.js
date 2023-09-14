@@ -5,6 +5,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { addAccount, accountStateClear, updateAccount, deleteAccount } from '../redux/slices/accountSlice';
 import IconButton from '../components/iconButton';
 import { getAccounts } from '../redux/slices/accountSlice'
+import { userLogOut } from '../redux/slices/userSlice'
+
 
 
 const AccountCrudScreen = ({route,navigation})  => {
@@ -27,6 +29,17 @@ const AccountCrudScreen = ({route,navigation})  => {
       dispatch(getAccounts())
       Alert.alert(`Account ${account.action}`,account.msg)
       navigation.navigate('Start')
+    }else if (account?.code === 403){
+      Alert.alert(
+        'Expired Sesion',
+        'Your session is expired',
+        [{ text: 'OK', onPress: () => {
+          dispatch(accountStateClear());
+          dispatch(userLogOut());
+          navigation.navigate('Login')
+          }
+        }]
+    );
     }
   },[account])
 

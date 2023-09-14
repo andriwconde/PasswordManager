@@ -1,8 +1,10 @@
 import React,{ useState, useEffect, useRef } from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, FlatList, ActivityIndicator, DrawerLayoutAndroid } from 'react-native'
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { BackHandler } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogOut } from '../redux/slices/userSlice'
+import { accountStateClear } from '../redux/slices/accountSlice'
 import { useIsFocused } from '@react-navigation/native';
 import { getAccounts, deleteManyAccounts } from '../redux/slices/accountSlice'
 import IconButton from '../components/iconButton';
@@ -17,27 +19,28 @@ const StartScreen = ({navigation}) => {
     const [deleteChecknoxValues,setDeleteChecknoxValues] = useState([])
     
     useEffect(() => {
-        if(isFocused){
-            const navBRlistener = navigation.addListener('beforeRemove', (e) => {
-                e.preventDefault();
-                Alert.alert(
-                      'Log out?',
-                      'Are you sure to Log out?',
-                      [{ text: "Don't Log out", style: 'cancel', onPress: () => {} },
-                      { text: 'Log out',
-                        style: 'destructive',
-                        onPress: () => {
-                             dispatch(userLogOut());
-                             navigation.dispatch(e.data.action);
-                        }
-                      }
-                      ]
-                );
-            })
-            return navBRlistener
-        }
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+        return () => {
+          backHandler.remove();
+        };
     },[isFocused]);
 
+    useEffect(() => {
+        if(accounts?.code === 403){
+            Alert.alert(
+                'Expired Sesion',
+                'Your session is expired',
+                [{ text: 'OK', onPress: () => {
+            dispatch(accountStateClear());
+            dispatch(userLogOut());
+            navigation.navigate('Login')
+                    }
+                }]
+            );
+
+        }
+    },[accounts])
 
 useEffect(() => {
     dispatch(getAccounts())
@@ -47,6 +50,25 @@ const addAccount = ()=>{
     setShowDeleteCheckbox(false)
     setDeleteChecknoxValues([])
     navigation.navigate('AccountCrud')
+}
+
+const handleBackPress=()=>{
+    let res = true 
+    Alert.alert(
+        'Log out?',
+        'Are you sure to Log out?',
+        [{ text: "Don't Log out", style: 'cancel', onPress: () => res = true },
+        { text: 'Log out',
+          style: 'destructive',
+          onPress: () => {
+              dispatch(userLogOut());
+              navigation.navigate('Login')
+              res = false
+          }
+        }
+        ]
+    );
+    return res
 }
 
 const showDeleteCheckboxFn = ()=>{
