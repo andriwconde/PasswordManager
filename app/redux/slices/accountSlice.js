@@ -56,12 +56,24 @@ export const deleteAccount = createAsyncThunk(
   }
 )
 
+export const deleteManyAccounts = createAsyncThunk(
+  'account/deleteMany',
+  async (accountsArray) => {
+    try{
+      const response = await accountWS.deleteManyAccounts({accountsArray})
+      return response.data.data
+    }catch(err){
+      console.log(err)
+    }
+  }
+)
+
 export const getAccounts = createAsyncThunk(
   'account/getAccounts',
   async ()=>{
     try{
       const user_id = await EncryptedStorage.getItem('user_id');
-      const encrytedAccounts = await accountWS.getAccounts({user_id})
+      const encrytedAccounts = await accountWS.getAccounts({user_id});
       const keys = JSON.parse(await EncryptedStorage.getItem('transferKeys'));
       const decryptedAccounts = await Promise.all( encrytedAccounts.data.data.map(async (account)=>{
          return  JSON.parse(await RSA.decrypt(account,keys.private))
@@ -136,6 +148,19 @@ const accountStateClear = createAction('account/clear')
         state.account = 'error'
         state.error = action.error.message
       })
+//------------------deleteManyAccounts-----------------------------------------
+      builder.addCase(deleteManyAccounts.pending, (state) => {
+        state.loading='LOADING'
+      })
+      builder.addCase(deleteManyAccounts.fulfilled, (state,action) => {
+        state.loading = 'FULFILLED'
+        state.accounts = action.payload
+      })
+      builder.addCase(deleteManyAccounts.rejected, (state,action) => {
+        state.loading = 'REJECTED'
+        state.accounts = 'error'
+        state.error = action.error.message
+      })
 //-----simple reducers -----------------------------------------------
       builder.addCase(accountStateClear, (state) => {
         state.account = false
@@ -149,4 +174,5 @@ const accountStateClear = createAction('account/clear')
   module.exports.getAccounts = getAccounts
   module.exports.accountStateClear = accountStateClear
   module.exports.deleteAccount = deleteAccount
+  module.exports.deleteManyAccounts = deleteManyAccounts
 

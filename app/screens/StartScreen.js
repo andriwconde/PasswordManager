@@ -1,114 +1,93 @@
 import React,{ useState, useEffect, useRef } from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, FlatList, ActivityIndicator, DrawerLayoutAndroid } from 'react-native'
-import CheckBox from '@react-native-community/checkbox';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import ReactNativeBiometrics from 'react-native-biometrics'
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogOut } from '../redux/slices/userSlice'
 import { useIsFocused } from '@react-navigation/native';
-import { getAccounts } from '../redux/slices/accountSlice'
-import EncryptedStorage from 'react-native-encrypted-storage';
+import { getAccounts, deleteManyAccounts } from '../redux/slices/accountSlice'
 import IconButton from '../components/iconButton';
-import { Drawer } from '../components/drawer';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 const StartScreen = ({navigation}) => {
-    const drawer = useRef(null);
     const dispatch = useDispatch()
     const isFocused = useIsFocused()
-    const rnBiometrics = new ReactNativeBiometrics()
     const accounts = useSelector(state=>state.account.accounts)
     const loading = useSelector(state=>state.account.loading)
-    const [bioCheckBox, setBioCheckbox] = useState({ show:false, value:false })
     const [showDeleteCheckbox, setShowDeleteCheckbox] = useState(false)
     const [deleteChecknoxValues,setDeleteChecknoxValues] = useState([])
     
     useEffect(() => {
-        navigation.addListener('beforeRemove', (e) => {
-        e.preventDefault();
-        Alert.alert(
-            'Log out?',
-            'Are you sure to Log out?, you will lose biometric autentication',
-            [{ text: "Don't Log out", style: 'cancel', onPress: () => {} },
-             { text: 'Log out',
-               style: 'destructive',
-               onPress: async() => {
-                await EncryptedStorage.clear();
-                await rnBiometrics.deleteKeys();
-                const { keysExist } = await rnBiometrics.biometricKeysExist()
-                trasferKeys = await EncryptedStorage.getItem('transferKeys')
-                if(keysExist === false && trasferKeys === null){
-                    dispatch(userLogOut());
-                    navigation.dispatch(e.data.action);
-                }
-               }
-             }
-            ]
-        );
-    })
-    },[navigation]);
+        if(isFocused){
+            const navBRlistener = navigation.addListener('beforeRemove', (e) => {
+                e.preventDefault();
+                Alert.alert(
+                      'Log out?',
+                      'Are you sure to Log out?',
+                      [{ text: "Don't Log out", style: 'cancel', onPress: () => {} },
+                      { text: 'Log out',
+                        style: 'destructive',
+                        onPress: () => {
+                             dispatch(userLogOut());
+                             navigation.dispatch(e.data.action);
+                        }
+                      }
+                      ]
+                );
+            })
+            return navBRlistener
+        }
+    },[isFocused]);
 
 
 useEffect(() => {
     dispatch(getAccounts())
 },[])
 
-useEffect(() => {
-    isFocused  &&  hasBioAuthSensor()
-},[isFocused])
-
-useEffect(() => {
-    if(bioCheckBox.value){
-        navigation.navigate('BiometricEnrollment');
-    }
-},[bioCheckBox.value])
-    
-const hasBioAuthSensor = async () => {
-    try{
-        const {available} = await rnBiometrics.isSensorAvailable()
-        const { keysExist } = await rnBiometrics.biometricKeysExist()
-        if(available && keysExist){
-            setBioCheckbox({...bioCheckBox,show:false})
-        }else if(available && !keysExist){
-            Alert.alert(
-                'Welcome',
-                'Do you want to enable biometric autentication?',
-                [{ text: "No Thanks", style: 'cancel', onPress: () => {} },
-                 { text: 'Yes',
-                   style: 'destructive',
-                   onPress: () => navigation.navigate('BiometricEnrollment')
-                 }
-                ]
-            );
-            //setBioCheckbox({show:true,value:false})
-        }
-    }catch(error){
-        console.log(error)
-    }
-}
-
 const addAccount = ()=>{
+    setShowDeleteCheckbox(false)
+    setDeleteChecknoxValues([])
     navigation.navigate('AccountCrud')
 }
 
 const showDeleteCheckboxFn = ()=>{
-    setShowDeleteCheckbox(!showDeleteCheckbox)
+    if(showDeleteCheckbox){
+        setDeleteChecknoxValues([])
+        setShowDeleteCheckbox(false)
+    }else{
+        setShowDeleteCheckbox(true)
+    }
 }
 
 const setDeletCheckboxValues = (account_id)=>{
     setDeleteChecknoxValues(deleteChecknoxValues.concat([account_id]))
 }
 
+const deleteMany = ()=>{
+    Alert.alert(
+        'Delete selected',
+        'Are you sure you want delete selected accounts?',
+        [{ text: "Don't delete", style: 'cancel', onPress: () => {} },
+         { text: 'Delete',
+           style: 'destructive',
+           onPress: () => {
+            dispatch(deleteManyAccounts(deleteChecknoxValues))
+            setShowDeleteCheckbox(false)
+            setDeleteChecknoxValues([])
+            dispatch(getAccounts())
+           }
+         }
+        ]
+    );
+}
+
 const options = ()=>{
-    drawer.current?.openDrawer()
+    setShowDeleteCheckbox(false)
+    setDeleteChecknoxValues([])
+    navigation.openDrawer();
 }
 
 
     return (
-/*         <DrawerLayoutAndroid
-            ref={drawer}
-            drawerWidth={300}
-            drawerPosition='right'
-            renderNavigationView={Drawer}
-            style={style.backgroundView}> */
         <View style={style.backgroundView}>
             <View style={style.headerContainer}>
                 <Text style={style.titleText}>Accounts</Text>
@@ -142,8 +121,13 @@ const options = ()=>{
                     keyExtractor={account => account._id}
                 />
             </View>
+            {showDeleteCheckbox && <Pressable
+                onPress={deleteMany} 
+                style={style.deleteManyButton}>
+                <Icon name={'delete'} size={40} color={'#FF6565'}/>
+                <Text style={style.deleteManyText}>Delete</Text>
+            </Pressable>}
         </View>
-        /* </DrawerLayoutAndroid> */
     );
 }
 
@@ -207,15 +191,32 @@ const style = StyleSheet.create({
         backgroundColor:'white',
         borderColor:'white',
         paddingHorizontal:5,
-        height:'85%'
+        height:'70%',
+        marginBottom:'5%'
     },
     divider:{
         borderBottomWidth:1,
         borderBottomColor:'#BCBCBC'
     },
-      itemDataView:{
+    itemDataView:{
         flex:1
-      }
+    },
+    deleteManyButton:{
+        flexDirection:'row',
+        backgroundColor:'white',
+        width:'50%',
+        alignSelf:'center',
+        justifyContent:'center',
+        borderRadius:4,
+        paddingVertical:10,
+        alignItems:'center'
+    },
+    deleteManyText:{
+        color:'#FF6565',
+        fontSize:23,
+        fontWeight:'bold',
+        marginLeft:15
+    }
 })
 
 export default StartScreen;

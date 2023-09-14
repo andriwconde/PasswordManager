@@ -1,7 +1,7 @@
 import React,{useEffect, useState} from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { userRegister } from '../redux/slices/userSlice'
+import { userRegister,cleanRegister } from '../redux/slices/userSlice'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const RegisterScreen =({navigation})=>{
@@ -20,6 +20,7 @@ const RegisterScreen =({navigation})=>{
   useEffect(() => {
     if(registered){
       navigation.navigate('Login')
+      dispatch(cleanRegister())
     }
   },[registered])
 

@@ -1,4 +1,4 @@
-import React,{ useState, useEffect } from 'react';
+import React,{ useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -6,22 +6,27 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 import { userLogin, userBioLogin } from '../redux/slices/userSlice';
 import { Divider } from '../components/Divider';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import FingerprintButton from '../components/FingerprintButton';
+import { useIsFocused } from '@react-navigation/native';
 
 const LoginScreen = ({navigation})  => {
   const dispatch = useDispatch()
+  const cleanTextInputs = [useRef(null), useRef(null)];
   const loggedUser = useSelector(state => state.user.loggedUser)
   const loading = useSelector(state => state.user.loading)
+  const isFocused = useIsFocused()
+  const [bioButton, setBioButton] = useState(false)
   const [visibility, setVisibility]= useState(false)
   const [modalState, setModalState] = useState(false)
   const [formValues,setFormValues] = useState({
-    email: null,
-    password: null,
+    email: "",
+    password: "",
     bioPK: null
   })
 
 useEffect(() => {
-  hasBioAuthSensor()
-},[])
+  isFocused && hasBioAuthSensor()
+},[isFocused])
 
 useEffect(() => {
   if(loggedUser?.user?.name){
@@ -41,6 +46,7 @@ const hasBioAuthSensor = async () => {
     if(available){
       const { keysExist } = await rnBiometrics.biometricKeysExist()
       if (keysExist){
+        setBioButton(true)
         const epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
         const user_id = await EncryptedStorage.getItem('user_id')
         const payload = `${epochTimeSeconds}__${user_id}`
@@ -67,16 +73,19 @@ const handleInput =(input,value)=>{
 }
 const handleSubmit = async () => {
   const {email,password} = formValues
- if(email === null || password === null) {
+ if(email === "" || password === "") {
   setModalState(true);
-} else{
+} else if(email !== "" && password !== ""){
   dispatch(userLogin(formValues));
+  cleanTextInputs[0].current.clear()
+  cleanTextInputs[1].current.clear()
 }
 }
 
 
   return (
     <ScrollView contentContainerStyle={style.backgroundView}>
+      {bioButton && <FingerprintButton onPress={hasBioAuthSensor}/>}
       <View style={style.loginForm}>
         <View style={style.loginTitle}>
           <Text style={style.titleText}>Login</Text>
@@ -85,6 +94,7 @@ const handleSubmit = async () => {
           <View style={style.inputView}>
             <Text style={style.inputTitleTextStyle}>E-mail:</Text>
             <TextInput 
+              ref={cleanTextInputs[0]}
               style={style.inputStyles} 
               placeholder='example@mail.com'
               onChangeText={(value)=>handleInput('email',value)}
@@ -96,6 +106,7 @@ const handleSubmit = async () => {
             <Text style={style.inputTitleTextStyle}>Password:</Text>
             <View >
               <TextInput 
+              ref={cleanTextInputs[1]}
               style={style.inputStyles}
               placeholder='one-secure-password'
               placeholderTextColor='#ACACAC'

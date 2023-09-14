@@ -12,5 +12,8 @@ export default userWS = {
     },
     deleteAccount: async function (account_id){
         return await axios.post('/account/delete', account_id)
+    },
+    deleteManyAccounts: async function (accountsArray){
+        return await axios.post('/account/deleteMany', accountsArray)
     }
 };
