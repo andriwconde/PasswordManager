@@ -75,11 +75,13 @@ const addAccount = ()=>{
 
 
 const showDeleteCheckboxFn = ()=>{
-    if(showDeleteCheckbox){
-        setDeleteChecknoxValues([])
-        setShowDeleteCheckbox(false)
-    }else{
-        setShowDeleteCheckbox(true)
+    if(accounts?.length){
+        if(showDeleteCheckbox){
+            setDeleteChecknoxValues([])
+            setShowDeleteCheckbox(false)
+        }else{
+            setShowDeleteCheckbox(true)
+        }
     }
 }
 
