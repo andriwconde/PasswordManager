@@ -1,4 +1,4 @@
-import React,{ useState, useEffect, useRef } from 'react';
+import React,{ useState, useEffect, useRef, useCallback } from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, FlatList, ActivityIndicator, DrawerLayoutAndroid } from 'react-native'
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { BackHandler } from 'react-native';
@@ -9,6 +9,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { getAccounts, deleteManyAccounts } from '../redux/slices/accountSlice'
 import IconButton from '../components/iconButton';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useFocusEffect } from '@react-navigation/native';
 
 const StartScreen = ({navigation}) => {
     const dispatch = useDispatch()
@@ -18,13 +19,32 @@ const StartScreen = ({navigation}) => {
     const [showDeleteCheckbox, setShowDeleteCheckbox] = useState(false)
     const [deleteChecknoxValues,setDeleteChecknoxValues] = useState([])
     
-    useEffect(() => {
-        const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-
-        return () => {
-          backHandler.remove();
-        };
-    },[isFocused]);
+    useFocusEffect(
+        useCallback(() => {
+                const handleBackPress= ()=>{
+                    Alert.alert(
+                        'Log out?',
+                        'Are you sure to Log out?',
+                        [{ text: "Don't Log out", style: 'cancel', onPress: () => {} },
+                        { text: 'Log out',
+                          style: 'destructive',
+                          onPress: () => {
+                              dispatch(userLogOut());
+                              navigation.navigate('Login')
+                          }
+                        }
+                        ]
+                    );
+                    return true
+                }
+    
+                const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+                
+                return () => {
+                  backHandler.remove();
+                };
+        },[isFocused])
+    )
 
     useEffect(() => {
         if(accounts?.code === 403){
@@ -52,24 +72,7 @@ const addAccount = ()=>{
     navigation.navigate('AccountCrud')
 }
 
-const handleBackPress=()=>{
-    let res = true 
-    Alert.alert(
-        'Log out?',
-        'Are you sure to Log out?',
-        [{ text: "Don't Log out", style: 'cancel', onPress: () => res = true },
-        { text: 'Log out',
-          style: 'destructive',
-          onPress: () => {
-              dispatch(userLogOut());
-              navigation.navigate('Login')
-              res = false
-          }
-        }
-        ]
-    );
-    return res
-}
+
 
 const showDeleteCheckboxFn = ()=>{
     if(showDeleteCheckbox){
@@ -117,8 +120,10 @@ const options = ()=>{
                 <IconButton onPress={addAccount} icon='add' size={40} color="white"/>
                 <IconButton onPress={options} icon='more-vert' size={40} color="white"/>
             </View>
-            <View style={style.flatListContainer}>
-                <FlatList
+
+           <View style={style.flatListContainer}>
+            {console.log(accounts === [],{accounts},[])}
+            {accounts?.length ? <FlatList
                     data={accounts}
                     onRefresh={()=>dispatch(getAccounts())}
                     refreshing={loading === 'LOADING'}
@@ -141,7 +146,11 @@ const options = ()=>{
                     </Pressable>
                     }
                     keyExtractor={account => account._id}
-                />
+                />:
+                <View style={style.noAView}>
+                  <Text style={style.noAText}>No Accounts Yet</Text>
+                </View> 
+                }
             </View>
             {showDeleteCheckbox && <Pressable
                 onPress={deleteMany} 
@@ -238,6 +247,15 @@ const style = StyleSheet.create({
         fontSize:23,
         fontWeight:'bold',
         marginLeft:15
+    },
+    noAView:{
+        alignSelf:'center',
+        marginTop:'20%' 
+    },
+    noAText:{
+        color:'#BCBCBC',
+        fontSize:23,
+        fontWeight:'bold',
     }
 })
 
