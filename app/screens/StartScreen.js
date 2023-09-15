@@ -122,7 +122,6 @@ const options = ()=>{
             </View>
 
            <View style={style.flatListContainer}>
-            {console.log(accounts === [],{accounts},[])}
             {accounts?.length ? <FlatList
                     data={accounts}
                     onRefresh={()=>dispatch(getAccounts())}

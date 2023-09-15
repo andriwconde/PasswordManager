@@ -89,9 +89,7 @@ export const getAccounts = createAsyncThunk(
     try{
       const user_id = await EncryptedStorage.getItem('user_id');
       const encrytedAccounts = await accountWS.getAccounts({user_id});
-      console.log('outside',encrytedAccounts.data)
-      if(encrytedAccounts.data.data?.length >= 0){
-        console.log('if',encrytedAccounts.data)
+      if(encrytedAccounts.data.data?.length > 0){
         const keys = JSON.parse(await EncryptedStorage.getItem('transferKeys'));
         const decryptedAccounts = await Promise.all( encrytedAccounts.data.data.map(async (account)=>{
            return  JSON.parse(await RSA.decrypt(account,keys.private))
@@ -99,6 +97,8 @@ export const getAccounts = createAsyncThunk(
         return decryptedAccounts 
       }else if(encrytedAccounts.data.code === 403){
         return encrytedAccounts.data
+      }else if(encrytedAccounts.data.data?.length === 0){
+        return encrytedAccounts.data.data
       }
     }catch(err){
       console.log(err)
